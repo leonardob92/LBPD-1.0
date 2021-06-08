@@ -1,4 +1,4 @@
-%% PAPER NN1 - LEONARDO BONETTI
+%% PAPER "Spatiotemporal brain dynamics of musical patterns recognition" - LEONARDO BONETTI
 
 
 %BEFORE PROCEEDING, PLEASE NOTE:
