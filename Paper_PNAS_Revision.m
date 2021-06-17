@@ -51,7 +51,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Please note that LBPD functions rely on some external freely available functions/files
-%that we provide but that we did not write. More information about this is provided in the ReadMe.mat file that I strongly advise to read.
+%that I provide but that I did not write. More information about this is provided in the ReadMe.mat file that I strongly advise to read.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
