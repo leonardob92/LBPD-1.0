@@ -44,7 +44,7 @@
 %After that, you will be able to run the parts of this script that do not
 %require AU server and therefore reproduce the results and
 %plots that we provided (read ReadMe.mat for additional information).
-%Please, cite these codes and results referrring to the following paper:
+%Please, cite these codes and results referring to the following paper:
 % https://www.biorxiv.org/content/10.1101/2020.06.23.165191v2
 
 
