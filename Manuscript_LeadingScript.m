@@ -1,4 +1,4 @@
-%% PAPER NN1 - LEONARDO BONETTI
+%% PAPER "Spatiotemporal whole-brain dynamics of auditory patterns recognition" - LEONARDO BONETTI
 
 
 %BEFORE PROCEEDING, PLEASE NOTE:
