@@ -62,7 +62,7 @@
 % functions, have been employed in the attached script and can be
 % used to replicate the results of the study that we refer to as an example
 % for using these codes.
-% Part of the provided LBPD codes has been used here:
+% A part of the provided LBPD codes has been used here:
 % https://www.biorxiv.org/content/10.1101/2020.06.23.165191v2
 
 
