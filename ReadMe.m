@@ -2,7 +2,7 @@
 
 % CITATION
 % If you find LBPD functions useful, please cite the following paper:
-% https://www.biorxiv.org/content/10.1101/2020.06.23.165191v2
+% https://www.biorxiv.org/content/10.1101/2020.06.23.165191v3.full
 
 % INTRODUCTION TO LBPD
 % LBPD is a collection of functions for MEG brain activity and connectivity
@@ -62,7 +62,7 @@
 % functions, have been employed in the attached script and can be
 % used to replicate the results of the study that we refer to as an example
 % for using a part of these codes, which can be found here:
-% https://www.biorxiv.org/content/10.1101/2020.06.23.165191v2
+% https://www.biorxiv.org/content/10.1101/2020.06.23.165191v3.full
 
 
 
