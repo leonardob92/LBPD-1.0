@@ -1,4 +1,4 @@
-%% PAPER NN1 - LEONARDO BONETTI
+%% PAPER "Spatiotemporal whole-brain dynamics of auditory patterns recognition" - LEONARDO BONETTI
 
 
 %BEFORE PROCEEDING, PLEASE NOTE:
@@ -2485,4 +2485,3 @@ for ii = 1:3 %Bach's original, Bach variation, and their contrast
 end
 
 %%
-
