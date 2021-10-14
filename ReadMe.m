@@ -1,8 +1,9 @@
 %%% LBPD %%%
 
 % CITATION
-% If you find LBPD functions useful, please cite the following paper:
-% https://www.biorxiv.org/content/10.1101/2020.06.23.165191v3.full
+% If you find LBPD functions useful, please cite the following paper(s):
+% 1) https://www.biorxiv.org/content/10.1101/2020.06.23.165191v3.full
+% 2) https://www.biorxiv.org/content/10.1101/2020.12.11.421669v1
 
 % INTRODUCTION TO LBPD
 % LBPD is a collection of functions for MEG brain activity and connectivity
@@ -24,6 +25,9 @@
 % If you notice that I did not properly acknowledge the contribution of
 % some external functions and their authors, I apologise. In that case,
 % please let me know and I will made the requested changes.
+% Please, use the Leading Scripts provided in the "LeadingScripts" folder
+% to better understand how the LBPD (and other) functions (e.g.functions from SPM/FiledTrip/OSL,etc.)
+% have been used to perform the analyses reported in the manuscripts mentioned above.
 % Please, note that LBPD is free software and therefore you can redistribute
 % it and/or modify it under the terms of the GNU General Public License as
 % published by the Free Software Foundation, either version 3 of the License,
@@ -59,17 +63,15 @@
 % (and use only the functions that do not explicitely require OSL).
 % A special acknowledgment must be made also for the codes developed by
 % Dimitrios Pantazis that, even if not directly connected to LBPD
-% functions, have been employed in the attached script and can be
-% used to replicate the results of the study that we refer to as an example
-% for using a part of these codes, which can be found here:
+% functions, have been employed in the attached Leading Script(s) and can be
+% used to understand the results of the following study:
 % https://www.biorxiv.org/content/10.1101/2020.06.23.165191v3.full
 
 
 
 % LBPD FUNCTIONS RECAP
-% Please, note that the above-referenced manuscript includes analyses that
-% used most of the first 23 functions reported below.
-% The remaining functions have been made publicly available already now, but they
+% Please, note that the Leading Scripts uses different subsets of the functions reported below.
+% All these functions have been made publicly available already now, and they
 % will be further documented, explained and complemented with examples in
 % future works that will be published soon.
 % 
@@ -103,7 +105,7 @@
 % 22)oneD_MCS_LBPD_D
 % 23)twoD_MCS_LBPD_D
 
-% Additional functions (for source reconstruction using Beamforming, plotting networks in the brain, etc.; not used in the analyses reported in the above-referenced manuscript)
+% Additional functions (for source reconstruction using Beamforming, plotting networks in the brain, MCS on graph theoretical measures etc.)
 % 24)BrainSources_MonteCarlosim_3D_LBPD_D
 % 25)GT_modul_plot_LBPD
 % 26)LF_3D_plot_LBPD
@@ -113,7 +115,11 @@
 % 30)plot_wave_conditions
 % 31)schemaball_modularity_LBPD
 % 32)sources_3D_plot_LBPD
-
+% 33)cluster_DTI_perm_2groups_1
+% 34)cluster_DTI_perm_2groups_2
+% 35)cluster_DTI_perm_2groups_3
+% 36)DTI_cluster_perm_2groups_LBPD
+% 37)DTI_GT_MCS
 
 
 
