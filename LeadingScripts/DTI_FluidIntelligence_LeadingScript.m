@@ -13,6 +13,8 @@
 %Data can be provided according to the Danish regulation, upon reasonable request.
 %If interested, please contact Leonardo Bonetti, leonardo.bonetti@clin.au.dk
 %More information is provided in the ReadMe.mat file that I strongly advise to read.
+%This script was used for the following paper:
+%https://www.biorxiv.org/content/10.1101/2021.10.14.464389v1
 
 
 %Leonardo Bonetti, Silvia Elisabetta Portis Bruzzone
