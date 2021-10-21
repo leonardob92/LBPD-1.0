@@ -106,7 +106,7 @@
 % 22)oneD_MCS_LBPD_D
 % 23)twoD_MCS_LBPD_D
 
-% Additional functions (for source reconstruction using Beamforming, plotting networks in the brain, MCS on graph theoretical measures etc.)
+% Additional functions (for source reconstruction using Beamforming, plotting networks in the brain, MCS on graph theoretical measures, spatial-functional k-means clustering to estimate a functional parcellation of the brain, etc.)
 % 24)BrainSources_MonteCarlosim_3D_LBPD_D
 % 25)GT_modul_plot_LBPD
 % 26)LF_3D_plot_LBPD
@@ -121,6 +121,11 @@
 % 35)cluster_DTI_perm_2groups_3
 % 36)DTI_cluster_perm_2groups_LBPD
 % 37)DTI_GT_MCS
+% 38)FunctionalSpatialClustering_voxels2ROIs_LBPD_D
+% 39)STC_plottingtimeseries_LBPD
+
+% Additional scripts:
+% - Workbench_Codes_LocalMac_Example
 
 
 
