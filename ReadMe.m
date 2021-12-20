@@ -3,8 +3,11 @@
 % CITATION
 % If you find LBPD functions useful, please cite the following paper(s):
 % 1) https://www.biorxiv.org/content/10.1101/2020.06.23.165191v3.full
-% 2) https://www.biorxiv.org/content/10.1101/2020.12.11.421669v1
+% 2) Bonetti, L., Brattico, E., Carlomagno, F., Donati, G., Cabral, J., Haumann, N. T., ... & Kringelbach, M. L. (2021).
+%    Rapid encoding of musical tones discovered in whole-brain connectivity. NeuroImage, 118735.
+%    https://www.sciencedirect.com/science/article/pii/S1053811921010077
 % 3) https://www.biorxiv.org/content/10.1101/2021.10.14.464389v1
+% 4) https://www.biorxiv.org/content/10.1101/2021.10.14.464389v1.full
 
 % INTRODUCTION TO LBPD
 % LBPD is a collection of functions for MEG brain activity and connectivity
