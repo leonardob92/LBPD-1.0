@@ -7,7 +7,10 @@
 %    Rapid encoding of musical tones discovered in whole-brain connectivity. NeuroImage, 118735.
 %    https://www.sciencedirect.com/science/article/pii/S1053811921010077
 % 3) https://www.biorxiv.org/content/10.1101/2021.10.14.464389v1
-% 4) https://www.biorxiv.org/content/10.1101/2021.10.14.464389v1.full
+% 4) Bruzzone, S.E.P., Lumaca, M., Brattico, E., Vuust, P., Kringelbach, M.L., Bonetti, L. (2022).
+%    Dissociated brain functional connectivity of fast versus slow frequencies underlying individual differences in fluid intelligence:
+%    a DTI and MEG study. Scientific Reports, 12, 4746.
+%    https://www.nature.com/articles/s41598-022-08521-5
 
 % INTRODUCTION TO LBPD
 % LBPD is a collection of functions for MEG brain activity and connectivity
