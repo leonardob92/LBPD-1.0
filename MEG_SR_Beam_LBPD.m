@@ -65,6 +65,7 @@ function [ OUT ] = MEG_SR_Beam_LBPD( S )
 %                                            2 = mean divided by standard deviation
 %                                            3 = mean divided by square root of standard deviation
 %                                            4 = mean divided by (standard deviation divided by square root of number of trials) (actual t-value..)
+%                                            5 = single trials (i.e. all trials independently)
 %                                           -Contrasts between two experimental conditions:
 %                                            1 = simple difference of means over trials
 %                                            2-3-4 = two-sample t-tests,
@@ -566,6 +567,8 @@ for ii = 1:length(conditions) %over experimental conditions
             ERFs{ii} = mean(datameg(:,:,conds{ii}),3) ./ sqrt(std(datameg(:,:,conds{ii}),0,3)); %(variation of t-value, dividing mean over trials by their standard error
         elseif S.inversion.effects == 4 %mean divided by (st divided by square root of number of trials) (actual t-value..)
             ERFs{ii} = mean(datameg(:,:,conds{ii}),3) ./ (std(datameg(:,:,conds{ii}),0,3)./sqrt(length(conds{ii}))); %t-value (sort of), dividing mean over trials by their standard error
+        elseif S.inversion.effects == 5 %all trials
+            ERFs{ii} = datameg(:,:,conds{ii});
         end
     end
 end
@@ -578,10 +581,17 @@ if S.beamfilters.sensl == 3 && S.inversion.znorml ~= 1 %if you have both MEG sen
     rminn = zeros(length(conditions),1);
     indg = sort([2:3:306 3:3:306]); %index of gradiometers
     for cc = 1:length(conditions) %over conditions
-        maxx(cc) = max(max(abs(ERFs{cc}))); %maximum for each conditions (all MEG sensors, so magnetometers..)
-        minn(cc) = min(min(abs(ERFs{cc}))); %minimum for each condition (all MEG sensors, so magnetometers..)
-        rmaxx(cc) = max(max(abs(ERFs{cc}(indg,:)))); %maximum for each conditions (only gradiometers)
-        rminn(cc) = min(min(abs(ERFs{cc}(indg,:)))); %minimum for each condition (only gradiometers)
+        if S.inversion.effects < 5
+            maxx(cc) = max(max(abs(ERFs{cc}))); %maximum for each conditions (all MEG sensors, so magnetometers..)
+            minn(cc) = min(min(abs(ERFs{cc}))); %minimum for each condition (all MEG sensors, so magnetometers..)
+            rmaxx(cc) = max(max(abs(ERFs{cc}(indg,:)))); %maximum for each conditions (only gradiometers)
+            rminn(cc) = min(min(abs(ERFs{cc}(indg,:)))); %minimum for each condition (only gradiometers)
+        else
+            maxx(cc) = max(max(max(abs(ERFs{cc})))); %maximum for each conditions (all MEG sensors, so magnetometers..)
+            minn(cc) = min(min(min(abs(ERFs{cc})))); %minimum for each condition (all MEG sensors, so magnetometers..)
+            rmaxx(cc) = max(max(max(abs(ERFs{cc}(indg,:,:))))); %maximum for each conditions (only gradiometers)
+            rminn(cc) = min(min(min(abs(ERFs{cc}(indg,:,:))))); %minimum for each condition (only gradiometers)
+        end
     end
     rmax = max(maxx); %global maximum over all conditions (all MEG sensors, so magnetometers..)
     rmin = min(minn); %global minimum over all conditions (all MEG sensors, so magnetometers..)
@@ -594,34 +604,76 @@ if S.beamfilters.sensl == 3 && S.inversion.znorml ~= 1 %if you have both MEG sen
         %different strengths.. thus now:
         % 1) COVARIANCE MATRIX COMPUTED ON Z-SCORE NORMALIZED MEG DATA
         % 2) INVERSION COMPUTED ON MEG DATA SCALED WITH RESPECT TO RELATIVE DIFFERENCES BETWEEN EXPERIMENTAL CONDITIONS
-        dumones = ones(size(ERFs{cc},1),size(ERFs{cc},2));
-        dumones(ERFs{cc}<0) = -1; %getting a matrix with values -1 and 1 according to the original sign in ERFs{cc}
-        ERFs{cc} = abs(ERFs{cc}); %absolute value
-        ERFs{cc}(indg,:) = (ERFs{cc}(indg,:)-rming)./(rmaxg-rming).*(rmax-rmin) + rmin; %normalizing gradiometers on the basis of magnetometers (with respect to the conditions different strengths)
-        ERFs{cc} = ERFs{cc} .* dumones; %assigning the original sign to the data
+        if S.inversion.effects < 5
+            dumones = ones(size(ERFs{cc},1),size(ERFs{cc},2));
+            dumones(ERFs{cc}<0) = -1; %getting a matrix with values -1 and 1 according to the original sign in ERFs{cc}
+            ERFs{cc} = abs(ERFs{cc}); %absolute value
+            ERFs{cc}(indg,:) = (ERFs{cc}(indg,:)-rming)./(rmaxg-rming).*(rmax-rmin) + rmin; %normalizing gradiometers on the basis of magnetometers (with respect to the conditions different strengths)
+            ERFs{cc} = ERFs{cc} .* dumones; %assigning the original sign to the data
+        else
+            dumones = ones(size(ERFs{cc},1),size(ERFs{cc},2),size(ERFs{cc},3));
+            dumones(ERFs{cc}<0) = -1; %getting a matrix with values -1 and 1 according to the original sign in ERFs{cc}
+            ERFs{cc} = abs(ERFs{cc}); %absolute value
+            ERFs{cc}(indg,:,:) = (ERFs{cc}(indg,:,:)-rming)./(rmaxg-rming).*(rmax-rmin) + rmin; %normalizing gradiometers on the basis of magnetometers (with respect to the conditions different strengths)
+            ERFs{cc} = ERFs{cc} .* dumones; %assigning the original sign to the data
+        end
     end
 end
 %until here
 
 
-sources_ERFs = zeros(length(W),length(time),length(conditions));
 disp('computing inversion')
-for cc = 1:length(conditions) %over conditions
-    if ~isempty(ERFs{cc}) %if there was no condition cc in MEG data
-        for ii = 1:length(W) %over spatial filters (brain sources)
-            for tt = 1:length(time) %over time-points
-                sources_ERFs(ii,tt,cc) = W{ii} * ERFs{cc}(:,tt); %actual inversion
+if S.inversion.effects < 5
+    sources_ERFs = zeros(length(W),length(time),length(conditions));
+    for cc = 1:length(conditions) %over conditions
+        if ~isempty(ERFs{cc}) %if there was no condition cc in MEG data
+            for ii = 1:length(W) %over spatial filters (brain sources)
+                for tt = 1:length(time) %over time-points
+                    sources_ERFs(ii,tt,cc) = W{ii} * ERFs{cc}(:,tt); %actual inversion
+                end
             end
+        end
+    end
+else %single trials independently
+    %     sources_ERFs = zeros(length(W),length(time),length(conditions));
+    s_tr_ERFs = cell(length(conditions),1); %there may be a different number of trials in different conditions (e.g. in learningbach-recogminor), so you need to sotre different conditions in cells
+    for cc = 1:length(conditions) %over conditions
+        if ~isempty(ERFs{cc}) %if there was no condition cc in MEG data
+            sources_ERFs = zeros(length(W),length(time),size(ERFs{cc},3));
+            for ii = 1:length(W) %over spatial filters (brain sources)
+                for tt = 1:length(time) %over time-points
+                    for rr = 1:size(ERFs{cc},3) %over trials
+                        sources_ERFs(ii,tt,rr) = W{ii} * ERFs{cc}(:,tt,rr); %actual inversion
+                    end
+                end
+                disp(['spatial filter ' num2str(ii) ' / ' num2str(length(W)) ' - condition ' num2str(cc) ' / ' num2str(length(conditions))])
+            end
+            s_tr_ERFs{cc} = sources_ERFs;
         end
     end
 end
 %baseline correction (subtracting mean activity in the baseline)
 if ~isempty(S.inversion.bc)
     disp('computing baseline correction')
-    for cc = 1:length(conditions) %over conditions
-        if ~isempty(ERFs{cc}) %if there was no condition cc in MEG data
-            for ii = 1:length(W) %over spatial filters (brain sources)
-                sources_ERFs(ii,:,cc) = sources_ERFs(ii,:,cc) - mean(sources_ERFs(ii,S.inversion.bc(1):S.inversion.bc(2),cc),2);
+    if S.inversion.effects < 5
+        for cc = 1:length(conditions) %over conditions
+            if ~isempty(ERFs{cc}) %if there was no condition cc in MEG data
+                for ii = 1:length(W) %over spatial filters (brain sources)
+                    sources_ERFs(ii,:,cc) = sources_ERFs(ii,:,cc) - mean(sources_ERFs(ii,S.inversion.bc(1):S.inversion.bc(2),cc),2);
+                end
+            end
+        end
+    else %single trials independently
+        for cc = 1:length(conditions) %over conditions
+            if ~isempty(ERFs{cc}) %if there was no condition cc in MEG data
+                sources_ERFs = s_tr_ERFs{cc};
+                for ii = 1:length(W) %over spatial filters (brain sources)
+                    for rr = 1:size(s_tr_ERFs{cc},3) %over trials
+                        sources_ERFs(ii,:,rr) = sources_ERFs(ii,:,rr) - mean(sources_ERFs(ii,S.inversion.bc(1):S.inversion.bc(2),rr),2);
+                    end
+                    disp(['baseline correction - condition ' num2str(cc) ' / ' num2str(length(conditions))])
+                end
+                s_tr_ERFs{cc} = sources_ERFs;
             end
         end
     end
@@ -655,13 +707,22 @@ end
 % scatter(1:length(W),sources_OLD(:,timeselected),'o','r')
 % hold on
 % scatter(1:length(W),sources_NEW(:,timeselected),'o','b')
+
 %storing outputs
 OUT.data_MEG_sensors = ERFs;
-if S.inversion.abs == 1 %absolute values, if requested
-    sources_ERFs = abs(sources_ERFs);
+if S.inversion.effects < 5
+    if S.inversion.abs == 1 %absolute values, if requested
+        sources_ERFs = abs(sources_ERFs);
+    end
+    OUT.sources_ERFs = sources_ERFs; %no absolute values
+else
+    if S.inversion.abs == 1 %absolute values, if requested
+        for cc = 1:length(conditions) %over conditions
+            s_tr_ERFs{cc} = abs(s_tr_ERFs{cc});
+        end
+    end
+    OUT.sources_ERFs = s_tr_ERFs; %no absolute values
 end
-OUT.sources_ERFs = sources_ERFs; %no absolute values
-
 
 
 %%% MUST BE UPDATED SINCE NOW I GUESS IT WORKS WITH PREVIOUS MNI COORDINATES..
@@ -693,7 +754,8 @@ OUT.sources_ERFs = sources_ERFs; %no absolute values
 %     OUT.spatial_smoothing = [];
 % end
 %temporal smoothing
-if S.smoothing.tempsmootl == 1
+
+if S.smoothing.tempsmootl == 1 && S.inversion.effects < 5
     disp('computing temporal smoothing')
     %preparing inputs (same for all experimental conditions)
     x2 = 1; %dimension 1 of matrix requested by osl_gauss
@@ -723,6 +785,9 @@ if S.smoothing.tempsmootl == 1
     sources_ERFs = ERFs_temp_smooth; %assigning temporally smoothed matrix to previously computed "full inversion" matrix since you want the printing nifti images to be run on temporally (and maybe also spatially) smoothed data
 else
     OUT.ERFs_temp_smooth = [];
+    if S.smoothing.tempsmootl == 1 && S.inversion.effects == 5
+        warning('spatial and temporal smoothing are implemented for averaged ERFs only')
+    end
 end
 
 
@@ -730,49 +795,57 @@ end
 
 %%%%% V - PRINTING NIFTI IMAGE(s) %%%%%
 if S.nifti == 1
-    disp('%%%%% V - PRINTING NIFTI IMAGE(s) %%%%%')
-    % %getting maximum and minimum values experimental conditions together (used for scaling images)
-    % maxx = zeros(length(conditions),1);
-    % minn = zeros(length(conditions),1);
-    % for cc = 1:length(conditions)
-    %     maxx(cc) = max(max(abs(sources_ERFs(:,:,cc)))); %maximum for each conditions
-    %     minn(cc) = min(min(abs(sources_ERFs(:,:,cc)))); %minimum for each condition
-    % end
-    % rmax = max(maxx); %global maximum over all conditions
-    % rmin = min(minn); %global minimum over all conditions
-    warning('loading MNI152-T1 8mm brain newly sorted set of coordinates.. remember that if you want a different spatial resolution (e.g. 2mm), you need to create a new mask and update this line of code!!')
-    maskk = load_nii('/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External/MNI152_8mm_brain_diy.nii.gz'); %getting the mask for creating the figure
-    for iii = 1:length(conditions)
-        fnamenii = [workdir '/' S.out_name '_cond_' conditions{iii} '_norm' num2str(S.inversion.znorml) '_spatsmoot_' num2str(S.smoothing.spatsmootl) '_tempsmoot_' num2str(S.smoothing.tempsmootl) '_abs_' num2str(S.inversion.abs) '.nii.gz']; %path and name of the image to be saved
-        
-        %     %normalization of nifti image
-        %     SO = (abs(sources_ERFs(:,:,iii))-rmin)./(rmax-rmin).*(100-0) + 0; %normalizing according to some scale (e.g. 0-100)
-        %     if S.inversion.abs ~= 1 %absolute values, if requested
-        %         dumones = ones(size(sources_ERFs,1),size(sources_ERFs,2)); %matrix of ones with dimensions of sources_ERFs(:,:,iii)
-        %         dumones(sources_ERFs(:,:,iii)<0) = -1; %getting a matrix with values -1 and 1 according to the original sign in sources_ERFs(:,:,iii)
-        %         SO = SO .* dumones; %rebuilding the original sign of the matrix with scaled values
-        %     end
-        %without normalization
-        SO = sources_ERFs(:,:,iii);
-        %building nifti image
-        SS = size(maskk.img);
-        dumimg = zeros(SS(1),SS(2),SS(3),length(time));
-        for ii = 1:size(sources_ERFs,1) %over brain sources
-            dum = find(maskk.img == ii); %finding index of sources ii in mask image (MNI152_8mm_brain_diy.nii.gz)
-            [i1,i2,i3] = ind2sub([SS(1),SS(2),SS(3)],dum); %getting subscript in 3D from index
-            dumimg(i1,i2,i3,:) = SO(ii,:); %storing values for all time-points in the image matrix
+    if S.inversion.effects < 5
+        disp('%%%%% V - PRINTING NIFTI IMAGE(s) %%%%%')
+        % %getting maximum and minimum values experimental conditions together (used for scaling images)
+        % maxx = zeros(length(conditions),1);
+        % minn = zeros(length(conditions),1);
+        % for cc = 1:length(conditions)
+        %     maxx(cc) = max(max(abs(sources_ERFs(:,:,cc)))); %maximum for each conditions
+        %     minn(cc) = min(min(abs(sources_ERFs(:,:,cc)))); %minimum for each condition
+        % end
+        % rmax = max(maxx); %global maximum over all conditions
+        % rmin = min(minn); %global minimum over all conditions
+        warning('loading MNI152-T1 8mm brain newly sorted set of coordinates.. remember that if you want a different spatial resolution (e.g. 2mm), you need to create a new mask and update this line of code!!')
+        maskk = load_nii('/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External/MNI152_8mm_brain_diy.nii.gz'); %getting the mask for creating the figure
+        for iii = 1:length(conditions)
+            fnamenii = [workdir '/' S.out_name '_cond_' conditions{iii} '_norm' num2str(S.inversion.znorml) '_spatsmoot_' num2str(S.smoothing.spatsmootl) '_tempsmoot_' num2str(S.smoothing.tempsmootl) '_abs_' num2str(S.inversion.abs) '.nii.gz']; %path and name of the image to be saved
+            
+            %     %normalization of nifti image
+            %     SO = (abs(sources_ERFs(:,:,iii))-rmin)./(rmax-rmin).*(100-0) + 0; %normalizing according to some scale (e.g. 0-100)
+            %     if S.inversion.abs ~= 1 %absolute values, if requested
+            %         dumones = ones(size(sources_ERFs,1),size(sources_ERFs,2)); %matrix of ones with dimensions of sources_ERFs(:,:,iii)
+            %         dumones(sources_ERFs(:,:,iii)<0) = -1; %getting a matrix with values -1 and 1 according to the original sign in sources_ERFs(:,:,iii)
+            %         SO = SO .* dumones; %rebuilding the original sign of the matrix with scaled values
+            %     end
+            %without normalization
+            SO = sources_ERFs(:,:,iii);
+            %building nifti image
+            SS = size(maskk.img);
+            dumimg = zeros(SS(1),SS(2),SS(3),length(time));
+            for ii = 1:size(sources_ERFs,1) %over brain sources
+                dum = find(maskk.img == ii); %finding index of sources ii in mask image (MNI152_8mm_brain_diy.nii.gz)
+                [i1,i2,i3] = ind2sub([SS(1),SS(2),SS(3)],dum); %getting subscript in 3D from index
+                dumimg(i1,i2,i3,:) = SO(ii,:); %storing values for all time-points in the image matrix
+            end
+            nii = make_nii(dumimg,[8 8 8]); %making nifti image from 3D data matrix (and specifying the 8 mm of resolution)
+            nii.img = dumimg; %storing matrix within image structure
+            nii.hdr.hist = maskk.hdr.hist; %copying some information from maskk
+            disp(['saving nifti image - condition ' num2str(iii)])
+            save_nii(nii,fnamenii); %printing image
         end
-        nii = make_nii(dumimg,[8 8 8]); %making nifti image from 3D data matrix (and specifying the 8 mm of resolution)
-        nii.img = dumimg; %storing matrix within image structure
-        nii.hdr.hist = maskk.hdr.hist; %copying some information from maskk
-        disp(['saving nifti image - condition ' num2str(iii)])
-        save_nii(nii,fnamenii); %printing image
+    else
+        warning('printing nifti images is implemented only for averaged ERFs')
     end
 end
 
 %saving output on disk
 disp('saving results')
-save([S.norm_megsensors.workdir '/' S.out_name '_norm' num2str(S.inversion.znorml) '_abs_' num2str(S.inversion.abs) '.mat'],'OUT')
+if S.inversion.effects < 5 %normally small(ish) file
+    save([S.norm_megsensors.workdir '/' S.out_name '_norm' num2str(S.inversion.znorml) '_abs_' num2str(S.inversion.abs) '.mat'],'OUT')
+else %single trial data can be way bigger..
+    save([S.norm_megsensors.workdir '/' S.out_name '_norm' num2str(S.inversion.znorml) '_abs_' num2str(S.inversion.abs) '.mat'],'OUT','-v7.3')
+end
 
 %deleting Clone data and variable BF
 disp('deleting Clone data, BF and, if any, filtered MEG sensor data')

@@ -15,7 +15,7 @@ function [ PP ] = BrainSources_MonteCarlosim_3D_LBPD_D( S )
 
 %  INPUT:   -S.data:        actual data (binarized p-values) (double).
 %                           1st x 2nd x3rd spatial dimension
-%           -S.T:           path to image with t-values
+%           -S.T:           path to image with t-values or 3D matrix with actual t-values stored in the 3D brain layout
 %           -S.permut:      number of permutations for Monte Carlo simulation
 %           -S.clustmax:    set 1 for only max cluster size of each permutation MCS (more strict).
 %                           set 0 for every size of each cluster detected for each permutation MCS (less strict).
@@ -25,7 +25,7 @@ function [ PP ] = BrainSources_MonteCarlosim_3D_LBPD_D( S )
 %           -S.labels:      path to file with labels of parcellation (e.g. AAL)
 %           -S.MNIcoords:   MNI coordinates of MNI brain correspondent to the one used for the parcellation and
 %                           provided in S.parcelfile(e.g. 8-mm brain T1 MNI152).
-%           -S.mask:        mask of the brain layout youhave your results in
+%           -S.mask:        mask of the brain layout you have your results in
 %           -S.outdir:      directory where you want to save the results image in
 %           -S.anal_name:   name for the analysis (used to identify and save image and results)
 
@@ -66,9 +66,14 @@ clustmax = S.clustmax;
 permthresh = S.permthresh;
 mask = S.mask;
 SS = size(mask);
-T = load_nii(S.T);
-T2 = T.img;
-    
+if ischar(S.T) %if you provide path
+    T = load_nii(S.T); %loading image
+    T2 = T.img; %extracting data
+else
+    T2 = S.T; %otherwise assigning the data that was provided by the user
+%     T = load_nii('/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External/MNI152_8mm_brain_diy.nii.gz'); %loading a rnadom mask just to have the structure for saving the nifti image later..
+end
+
 %actual computation
 %getting data
 dummyt(dummyt==0) = NaN; %assigning 'NaN' to 0 values (that corresponds to the non-significant voxels)
@@ -131,8 +136,17 @@ if k_info_t ~= 0
             V(Idx1t{d(hh)}(jj),Idx2t{d(hh)}(jj),Idx3t{d(hh)}(jj)) = T2(Idx1t{d(hh)}(jj),Idx2t{d(hh)}(jj),Idx3t{d(hh)}(jj)); %for the voxels forming the cluster dd, storing the correspondent t-values
         end
         %saving results as nifti image
-        T.img = V;
-        save_nii(T,fname);
+        if ischar(S.T) %if you provide path
+            T.img = V;
+            save_nii(T,fname);
+        else
+            maskk = load_nii('/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External/MNI152_8mm_brain_diy.nii.gz'); %getting the mask for creating the figure
+            nii = make_nii(V,[8 8 8]);
+            nii.img = V; %storing matrix within image structure
+            nii.hdr.hist = maskk.hdr.hist; %copying some information from maskk
+            disp(['saving nifti image'])
+            save_nii(nii,fname); %printing image
+        end
         %getting MNI coordinates of significant voxels within the provided image
         [ mni_coords, ~ ] = osl_mnimask2mnicoords(fname);
         %extracting statistics

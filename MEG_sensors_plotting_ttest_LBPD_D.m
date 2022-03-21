@@ -1,4 +1,4 @@
-function [ OUT ] = MEG_sensors_plotting_ttest_LBPD_D2( S )
+function [ OUT ] = MEG_sensors_plotting_ttest_LBPD_D( S )
 
 % It prepares data (loading data or extracting it from SPM objects (usually
 % obtained from previous preprocessing in OSL)), optionally calculates t-tests
@@ -43,10 +43,10 @@ function [ OUT ] = MEG_sensors_plotting_ttest_LBPD_D2( S )
 %   -S.timeextract:                      vector with time-points (samples)
 %                                        to be extracted from SPM objects.
 %                                        If empty [], default is all time-points.
-%                                        This is meaningful only if S.data = [].
+%                                        This is meaningfull only if S.data = [].
 %   -S.centerdata0:                      1 to make the data starting from 0
 %   -S.spm_list:                         path to SPM object for each subject.
-%                                        This is meaningful only if S.data = [].
+%                                        This is meaningfull only if S.data = [].
 %   -S.conditions:                       conditions to be extracted (cell
 %                                        array with characters).
 %                                        E.g. {'Old';'New'}.
@@ -67,9 +67,11 @@ function [ OUT ] = MEG_sensors_plotting_ttest_LBPD_D2( S )
 %                                        of the S.data that you provide!
 %                                        They must also be consistent with S.condwaveform (the labels of the 
 %                                        conditions that you also provide for waveform plotting).
+%                                        Remember that if you plot the topoplot than S.topocondsing must
+%                                        be consistent with S.condnumb (I suggest to erase S.condnumb if you
+%                                        want to plot the topoplot..
 %   -S.save_data:                        1 for saving the data     
-%   -S.save_name_data:                   name for data file to be saved (character).
-%                                        This is used also to load t-tests and plot the difference topoplot.
+%   -S.save_name_data:                   name for data file to be saved (character)
 
 % -1)individual waveform plotting
 %   -S.waveform_singlechannels_label:    1 to plot single channel waveforms
@@ -82,7 +84,7 @@ function [ OUT ] = MEG_sensors_plotting_ttest_LBPD_D2( S )
 %   -S.y_lim_ampl_wave:                  limit for amplitude
 %                                        E.g. [0 120] magnetometes, [0 6] gradiometers
 %   -S.color_line                        RGB color codes provided
-%                                        as 3 x number of conditions matrix.
+%                                        as (number of conditions x 3) matrix.
 %                                        If you want automatic specification of the colors
 %                                        you need not to pass this field.
 
@@ -195,7 +197,7 @@ if isfield(S,'data') %it requires that S.data exists
                 conds(ii) = sum(find(strcmp((D.conditions),S.conditions{ii}))); %getting the condition numbers ordered according to the specification of the user in S.conditions (sum to avoid the problem of zero-vector occurring if it does not find the match between the specified label and the data label.. of course if you specify two times the same label in the structure S it crashes as well.. but you would need to be quite peculiar to do that so I assume you will not do that..)
             end
             if sum(double(conds == 0)) > 0 %this used to be an error; now it is converted in warning since user may be interested in plotting (mainly for exploratory reasons) a condition that occurs very seldomly and not for all participants (for instance ERF associated to wrong answers in a simple behavioral task)
-                warning(['for subject ' num2str(jj) ' you have specified a condition name that does not match the condition labels in the data..'])
+                warning(['for subject ' num2str(jj) ' you have specified a condition name that does not match with the condition labels in the data..'])
             end
             chans = D.chanlabels;
             idxMEGc1 = find(strcmp(chans,'MEG0111')); %getting extreme channels indexes (mag)
@@ -222,7 +224,6 @@ if isfield(S,'data') %it requires that S.data exists
             end
             disp(['subject ' num2str(jj) ' computed'])
         end
-        
         %centering data on 0 (NOT RECOMMENDED AND TO BE REMOVED IN THE FUTURE..)
         if S.centerdata0 == 1
             data2 = zeros(size(data_mat,1),size(data_mat,2),size(data_mat,3),size(data_mat,4)); %preallocating space
@@ -235,8 +236,6 @@ if isfield(S,'data') %it requires that S.data exists
             end
             data_mat = data2;
         end
-        %%% UNTIL HERE
-        
         %if requested, saving data
         if S.save_data == 1
             %creating the directory if it does not exist already
@@ -244,9 +243,9 @@ if isfield(S,'data') %it requires that S.data exists
                 mkdir(S.outdir);
             end
             %making 0s of data_mat equal to NaN for preventing later averages and t-tests to be affected by 0s that are not actual data (THIS IS ACTUALLY NOT MEANINGFUL ANYMORE AND COULD BE SIMPLY REMOVED..)
-            if ~isempty(data_mat(data_mat == 0))
+            if ~isempty(data_mat(data_mat(:,:,:,:) == 0))
                 warning('careful.. your data contains 0s.. assigning them NaNs..')
-                data_mat(data_mat == 0) = NaN;
+                data_mat(data_mat(:,2:end,:,:) == 0) = NaN;
             end
             save([S.outdir '/' S.save_name_data '.mat'],'data_mat','chanlabels','time_sel','S');
             condsl = S.conditions;
@@ -267,9 +266,9 @@ else
     error('you did not provide any data.. if you want to read data from SPM objects saved on disk, please give as input: S.data = []; ')
 end
 %making 0s of data_mat equal to NaN for preventing later averages and t-tests to be affected by 0s that are not actual data (THIS IS ACTUALLY NOT MEANINGFUL ANYMORE AND COULD BE SIMPLY REMOVED..)
-if ~isempty(data_mat(data_mat == 0))
+if ~isempty(data_mat(data_mat(:,:,:,:) == 0))
     warning('careful.. your data contains 0s.. assigning them NaNs..')
-    data_mat(data_mat == 0) = NaN;
+    data_mat(data_mat(:,2:end,:,:) == 0) = NaN;
 end
 Sz = size(data_mat); %used later for calculating standard errors
 
@@ -349,15 +348,13 @@ if S.waveform_singlechannels_label == 1
                     else
                         legcell(1,aa) = {S.condwaveform{aa}}; %same..
                     end
-%                     grid on
+                    grid on
                     grid minor
                 end                   
                 legend([legendv],legcell) %same..
                 legend('show');
                 title(chanlabels(countwave + kkk));
                 set(gcf,'Color','w')
-                grid on
-                grid minor
             end
         end
     end
@@ -484,18 +481,10 @@ if S.waveform_average_label == 1
         end
     end
     %mean
-    %leonardo 13/12/2020
-    mean_left_mag = squeeze(nanmean(nanmean(mat_left_mag,1),3)); %over channels (first nanmean) and participant (second nanmean))
-    stde_left_mag = squeeze(nanstd(nanmean(mat_left_mag,1),0,3))./sqrt(Sz(3));
-    if size(mean_left_mag,1) == 1 %transposing matrices if their first size is 1 (that means they have only the temporal dimension and that has been moved to the second dimension of the matrix because of "squeeze" which works in a way that in this case looks illogical to me.. anyway..)
-        mean_left_mag = mean_left_mag';
-        stde_left_mag = stde_left_mag';
-    end
-    
-    %mean_left_mag = squeeze(nanmean(squeeze(nanmean(mat_left_mag,1)),2));
+    mean_left_mag = squeeze(nanmean(squeeze(nanmean(mat_left_mag,1)),2));
 %     mean_right_mag = squeeze(mean(squeeze(mean(mat_right_mag,1)),2));
     %standard error
-    %stde_left_mag = squeeze(std(squeeze(nanmean(mat_left_mag,1)),0,2,'omitnan')/sqrt(Sz(3)));
+    stde_left_mag = squeeze(std(squeeze(nanmean(mat_left_mag,1)),0,2,'omitnan')/sqrt(Sz(3)));
 %     stde_right_mag = squeeze(std(squeeze(mean(mat_right_mag,1)),0,2)/sqrt(Sz(3)));
     %if you want to plot the average over conditions
     if S.wave_plot_conditions_together == 1
@@ -510,9 +499,8 @@ if S.waveform_average_label == 1
     end
     %actual plotting
     legcell = cell(1,cond_n);
-%     clf(figure(13))
-%     figure(13)
-    figure
+    clf(figure(13))
+    figure(13)
     thc = ones(cond_n)*2;
 %     %%% hard coding.. just for one specific purpose.. not for more general
 %     %%% ones..
@@ -597,7 +585,6 @@ if S.waveform_average_label == 1
                 legcell(1,aa) = {S.condwaveform{aa}}; %same..
             end
         end
-        ylim([ylims(1) ylims(2)])
     end
     grid on
     grid minor
