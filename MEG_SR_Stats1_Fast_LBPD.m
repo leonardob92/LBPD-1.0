@@ -2,7 +2,7 @@ function [ O ] = MEG_SR_Stats1_Fast_LBPD( S )
 O = [];
 
 % It computes statistics after beamforming (computed using MEG_SR_Beam_LBPD.m).
-% Main effects here are simply mean(X)./sqrt(std(X)), while contrast
+% Main effects here are simply mean(X)./sqrt(std(X)) (or just mean(X), while contrast
 % between 2 conditions are actual t-tests.
 % This function assumes that data is approximately normally distributed
 % which is often the case of this kind of data.
@@ -25,7 +25,7 @@ O = [];
 %                                  two or more -1 or 1 are interpreted as the mean over them first and then the contrast.
 %                                  Leave empty [] for no contrasts.
 %           -S.list:               list of subjects (mat files).
-%                                  Leave empty [] for automatic indexing of mat files of all subjects in S.workingdir
+%                                  Leave empty [] (or not define the field) for automatic indexing of mat files of all subjects in S.workingdir
 %           -S.effects:            Defining solution for computing main effects and contrasts:
 %                                  -Main effects of experimental conditions:
 %                                   1 = simple mean over subjects
@@ -235,7 +235,12 @@ if ~isempty(S.contrast)
             save([workingdir '/' S.plot_nifti_name '_sensors_plancomb_contrast_' num2str(aa) '.mat'],'t_val_c','S','aa')
         end
         if S.plot_nifti == 1
-            fnamenii = [workingdir '/Contr_' num2str(aa) '_abs_' num2str(OUT.S.inversion.abs) '.nii.gz']; %path and name of the image to be saved
+            if isempty(S.plot_nifti_name) %if empty, I simply do not add any name to the automatic name of the nifti images
+                pnn = 'Contr_';
+            else
+                pnn = [S.plot_nifti_name '_Contr_'];
+            end
+            fnamenii = [workingdir '/' pnn  num2str(aa) '_abs_' num2str(OUT.S.inversion.abs) '.nii.gz']; %path and name of the image to be saved
             %building nifti image
             SS = size(maskk.img);
             dumimg = zeros(SS(1),SS(2),SS(3),size(t_val_s,2));

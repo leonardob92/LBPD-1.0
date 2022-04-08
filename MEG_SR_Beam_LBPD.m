@@ -483,7 +483,7 @@ for ii = 1:length(L2) %over brain sources
     %combining dipole orientations
     tmp = llf' * Cinv * llf; %temporary estimation of covariance between sources
     nn = size(llf,2); %number of orientations
-    [u, ~] = svd(real(pinv_plus(tmp(1:nn,1:nn),2,0)),'econ'); %single value decomposition, code from Mark Woolrich and Robert Oostenveld; (2 would be equal  to the "reduce_rank" variable..)
+    [u, ~] = svd(real(pinv_plus(tmp(1:nn,1:nn),2,0)),'econ'); %single value decomposition, code from Mark Woolrich and Robert Oostenveld; (2 would be equal to the "reduce_rank" variable..)
     eta = u(:,1);
     llf = llf * eta; %actual reduction of the 3 orientations to 1 global vector
     %compuation of weights
