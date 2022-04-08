@@ -130,6 +130,7 @@
 % 37)DTI_GT_MCS
 % 38)FunctionalSpatialClustering_voxels2ROIs_LBPD_D
 % 39)STC_plottingtimeseries_LBPD
+% 40)MEG_SR_Stats_twogroups_LBPD
 
 % Additional scripts:
 % - Workbench_Codes_LocalMac_Example
