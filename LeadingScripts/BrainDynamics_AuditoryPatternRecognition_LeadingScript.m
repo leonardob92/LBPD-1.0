@@ -2485,3 +2485,295 @@ for ii = 1:3 %Bach's original, Bach variation, and their contrast
 end
 
 %%
+
+%% REVISION II - NEUROIMAGE
+
+%% HERE THE DECODING IS DONE WITH A PROPERLY APPLIED LOW-PASS FILTER (DONE ON THE CONTINUOUS DATA)
+% Results are nearly the same as the ones obtained with the codes reported above.
+% Nevertheless, this procedure is formally more correct.
+
+%% filtering
+
+addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/Cluster_ParallelComputing')
+% config of the cluster server
+clusterconfig('slot', 1); % set manually the job cluster slots
+% between 1 and 12 (n x 8gb of ram)
+clusterconfig('scheduler','cluster'); % set automatically the long run queue
+clusterconfig('long_running', 1); % set automatically the long run queue
+
+%additional low-pass filter
+list = dir('/scratch7/MINDLAB2017_MEG-LearningBach/Leonardo/LearningBach/after_maxfilter_mc/dff*recogminor_tsssdsm.mat');
+for ii = 1:length(list) % iterates over blocks !OBS!
+    if ii ~= 39
+        S2 = [];
+        S2.D = [list(ii).folder '/' list(ii).name];
+        S2.band = 'low';
+        S2.freq = 40;
+        jobid = job2cluster(@filtering,S2);
+    end
+    disp(ii)
+end
+
+%% epoching - one epoch per old/new excerpt (baseline = (-)100ms)
+
+prefix_tobeadded = 'e80'; %prefix to be added
+list = dir('/scratch7/MINDLAB2017_MEG-LearningBach/Leonardo/LearningBach/after_maxfilter_mc/fdff*recogminor_tsssdsm.mat');
+%iterates for the recognition files only
+for ii = 2:length(list) %indexing only the files wanted for this paper
+    %load the spm object
+    D = spm_eeg_load([list(ii).folder '/' list(ii).name]);
+    events = D.events;
+    %takes the correct triggers sent during the recording
+    count_evval = 0;
+    for ieve = 1:length(events)
+        if strcmp(events(ieve).type,'STI101_up')
+            if events(ieve).value == 5
+                count_evval = count_evval + 1;
+                trigcor(count_evval,1) = events(ieve).time + 0.010; %this takes the correct triggers and add 10ms of delay of the sound travelling into the tubes
+            end
+        end
+    end
+    if count_evval ~= 4 && count_evval ~= 80
+        disp('warning.. there is something wrong with the triggers');
+        disp(spm_files_reco_basen{ii}(8:end-12));
+    end
+    trl_sam = zeros(length(trigcor),3);
+    trl_sec = zeros(length(trigcor),3);
+    deftrig = zeros(length(trigcor),1);
+    for k = 1:length(trigcor)
+        deftrig(k,1) = 0.012 + trigcor(k,1); %adding a 0.012 seconds delay to the triggers sent during the experiment (this delay was due to technical reasons related to the stimuli)
+        trl_sec(k,1) = deftrig(k,1) - 0.1000; %beginning time-window epoch in s (please note that we computed this operation two times, obtaining two slightly different pre-stimulus times.
+        %this was done because for some computations was convenient to have a slightly longer pre-stimulus time
+        trl_sec(k,2) = deftrig(k,1) + 6.000; %end time-window epoch in s
+        trl_sec(k,3) = trl_sec(k,2) - trl_sec(k,1); %range time-windows in s
+        trl_sam(k,1) = round(trl_sec(k,1) * 150); %beginning time-window epoch in samples
+        trl_sam(k,2) = round(trl_sec(k,2) * 150); %end time-window epoch in samples
+        trl_sam(k,3) = -15; %sample before the onset of the stimulus (corresponds to 0.100ms)
+    end
+    %creates the epochinfo structure that is required for the source reconstruction later
+    epochinfo.trl = trl_sam;
+    epochinfo.time_continuous = D.time;
+    %switch the montage to 0 because for some reason OSL people prefer to do the epoching with the not denoised data
+    D = D.montage('switch',0);
+    %build structure for spm_eeg_epochs
+    S = [];
+    S.D = D;
+    S.trl = trl_sam;
+    S.prefix = prefix_tobeadded;
+    D = spm_eeg_epochs(S);
+    %store the epochinfo structure inside the D object
+    D.epochinfo = epochinfo;
+    D.save();
+    %take bad segments registered in oslview and check if they overlap with the trials. if so, it gives the number of overlapped trials that will be removed later   
+    count = 0;
+    Bad_trials = zeros(length(trigcor),1);
+    for kkk = 1:length(events) %over events
+        if strcmp(events(kkk).type,'artefact_OSL')
+            for k = 1:length(trl_sec) %over trials
+                if events(kkk).time - trl_sec(k,2) < 0 %if end of trial is > than beginning of artifact
+                    if trl_sec(k,1) < (events(kkk).time + events(kkk).duration) %if beginning of trial is < than end of artifact
+                        Bad_trials(k,1) = 1; %it is a bad trial (stored here)
+                        count = count + 1;
+                    end
+                end                  
+            end
+        end
+    end
+    %if bad trials were detected, their indices are stored within D.badtrials field
+    if count == 0
+        disp('there are no bad trials marked in oslview for');
+        disp(ii);
+    else
+        D = badtrials(D,find(Bad_trials),1); %get the indices of the badtrials marked as '1' (that means bad)
+        D.save(); %saving on disk
+        disp('bad trials are ')
+        D.badtrials
+    end
+end
+%define conditions - only 1 epoch for each old/new excerpt (baseline = (-)100ms)
+basnam_con_oc = {'Old_Correct'}; %;'Old_Correct_2';'Old_Correct_3';'Old_Correct_4';'Old_Correct_5'};
+basnam_con_nc = {'New_Correct'}; %'New_Correct_2';'New_Correct_3';'New_Correct_4';'New_Correct_5'};
+basnam_con_ouc = {'Old_Uncorrect'}; %;'Old_Uncorrect_2';'Old_Uncorrect_3';'Old_Uncorrect_4';'Old_Uncorrect_5'};
+basnam_con_nuc = {'New_Uncorrect'}; %;'New_Uncorrect_2';'New_Uncorrect_3';'New_Uncorrect_4';'New_Uncorrect_5'};
+xlsx_dir_behav = dir('/scratch7/MINDLAB2017_MEG-LearningBach/BehavioralResponses/*min.xlsx'); %dir to MEG behavioral results
+xlsx_dir_behav(39) = [];
+list = dir('/scratch7/MINDLAB2017_MEG-LearningBach/Leonardo/LearningBach/after_maxfilter_mc/e80fdff*recogminor_tsssdsm.mat');
+for ii = 1:length(list) %indexing only the files wanted for this paper
+    %load the spm object
+    D = spm_eeg_load([list(ii).folder '/' list(ii).name]);
+    [~,~,raw_recog] = xlsread([xlsx_dir_behav(ii).folder '/' xlsx_dir_behav(ii).name]);
+    for k = 1:length(D.trialonset)
+        if strcmp(raw_recog{(k + 1),3},'No_response') %if there was no response
+            D = D.conditions(k,'No_response');
+        elseif raw_recog{(k + 1),2}(1) == raw_recog{(k + 1),3}(1) %if the response was correct
+            if raw_recog{(k + 1),2}(1) == 'O' %if the response was old
+                D = D.conditions(k,basnam_con_oc); %assign old correct
+            else
+                D = D.conditions(k,basnam_con_nc); %otherwise assign new correct
+            end
+        else %else the response was wrong
+            if raw_recog{(k + 1),2}(1) == 'O' %if was old
+                D = D.conditions(k,basnam_con_ouc); %assign old uncorrect
+            else
+                D = D.conditions(k,basnam_con_nuc); %assign new uncorrect
+            end
+        end
+    end
+    if ~isempty(D.badtrials) %overwriting badtrials (if any) on condition labels
+        BadTrials = D.badtrials;
+        for badcount = 1:length(BadTrials)
+            D = D.conditions(BadTrials(badcount),'Bad_trial');
+        end
+    end
+    D = D.montage('switch',1);
+    D.epochinfo.conditionlabels = D.conditions; %to add for later use in the source reconstruction
+    D.save(); %saving data on disk
+    disp(num2str(ii))
+end
+
+%% *** ANALYSIS ***
+
+%% decoding - support vector machine (SVM) - multivariate pattern analysis - FIGURE 3A
+
+%The decoding consisted of support vector machines (SVM) implemented in
+%external functions that can be found at the following link:
+%http://www.csie.ntu.edu.tw/~cjlin/libsvm/
+%Those functions can be also used in Matlab with a few adjustments done to achieve a proper imlplementation
+%as described in the paper and including crucial steps such as, for example, cross validation.
+%In our case, we implemented them by using AU server, therefore the codes immediately below show how we provided the data to the AU server.
+%After that, we provide the output of the SVM algorithm so that you can reproduce
+%the statistics and the plotting solutions that we presented in the paper.
+%If you wish to know more about this SVM implementation, you are
+%very welcome to contact us.
+
+%% settings for AU server and SVM algorithm
+
+cd /projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Decoding
+addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Decoding')
+addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Decoding/scilearnlab')
+addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Decoding/scilearnlab/external');
+addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Decoding/scilearnlab/external/libsvm-3.21')
+addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Decoding/scilearnlab/external/libsvm-3.21/matlab')
+addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Decoding/SpatialLocation')
+addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Decoding/SpatialLocation/plotchannel')
+addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Decoding/permutationlab')
+addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Decoding/permutationlab/private1')
+addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Decoding/permutationlab/developer')
+make
+
+addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/Cluster_ParallelComputing')
+% config of the cluster server
+clusterconfig('slot', 1); % set manually the job cluster slots
+% between 1 and 12 (n x 8gb of ram)
+clusterconfig('scheduler','cluster'); % set automatically the long run queue
+clusterconfig('long_running', 1); % set automatically the long run queue
+
+%% preparing data for decoding functions (for AU server)
+
+time = [1 466]; %defining time of interest (this refers to 0.100sec before the onset of the stimuli)
+numperm = 100; %number of permutations
+kfold = 5; %number of categories for k-fold classification
+subjnum = {'01';'02';'03';'04';'05';'06';'07';'08';'09';'10';'11';'12';'13';'14';'15';'16';'17';'18';'19';'20';'21';'22';'23';'24';'25';'26';'27';'28';'29';'30';'31';'32';'33';'34';'35';'36';'37';'38';'39';'40';'41';'42';'43';'44';'45';'46';'47';'48';'49';'50';'51';'52';'53';'54';'55';'56';'57';'58';'59';'60';'61';'62';'63';'64';'65';'66';'67';'68';'69';'70';'71'}; %Everybody!!!!!!
+datadir = '/scratch7/MINDLAB2017_MEG-LearningBach/Leonardo/LearningBach/after_maxfilter_mc/';
+D1 = cell(length(subjnum),2);
+subjs_real = cell(1,length(subjnum));
+cty = 0;
+pairl = 1; %1 = pairwise decoding; 2 = multiclass (confusion matrix)
+if pairl == 1
+    savedir = '/scratch7/MINDLAB2017_MEG-LearningBach/Leonardo/PhDThesis/Paper1/Decoding/ProperLowPassContinuousData_40Hz/Revision_II_NeuroImage_nolowpass_pairwise_f/';
+else
+    savedir = '/scratch7/MINDLAB2017_MEG-LearningBach/Leonardo/PhDThesis/Paper1/Decoding/ProperLowPassContinuousData_40Hz/Revision_II_NeuroImage_multiclass_f/';
+end
+mkdir(savedir)
+for ii = 1:1:length(subjnum) %length(subjnum)
+    if ii ~= 39 %number 39 is simply a non-existent subject, however for computational reasons we decided to not update the ID of all other subjects and we preferred to simply leave this subject empty and ignore it in the computations
+        %loading data
+%         D = spm_eeg_load([datadir 'e80dffspmeeg_SUBJ00' subjnum{ii} 'recogminor_tsssdsm.mat']);
+        D = spm_eeg_load([datadir 'e80fdffspmeeg_SUBJ00' subjnum{ii} 'recogminor_tsssdsm.mat']);
+        old = find(strcmp('Old_Correct',D.conditions)); %getting condition old indices
+        new = find(strcmp('New_Correct',D.conditions)); %getting condition new indices
+        clear data condid ind
+        condid(1:length(old)) = {'O'}; %creating condition labels (first old)
+        condid(length(old):(length(old)+length(new))) = {'N'}; %(then new)
+        ind = [old new]; %rearranging indices (first old and then new)
+        idxMEGc1 = find(strcmp(D.chanlabels,'MEG0111')); %getting extreme channels indexes
+        idxMEGc2 = find(strcmp(D.chanlabels,'MEG2643')); %same
+        data = D(idxMEGc1:idxMEGc2,time(1):time(2),ind); %extracting data
+        %structure with inputs for AU server
+        S = [];
+        S.pairl = pairl;
+        S.data = data;
+        S.condid = condid;
+        S.numperm = numperm;
+        S.kfold = kfold;
+        S.savedir = savedir;
+        S.ii = ii;
+        disp(ii)
+        %job to cluster
+        jobid = job2cluster(@decoding, S);
+    end
+    if ii == 1 %saving D.time (time in seconds), only once
+        time_sel = D.time(time(1):time(2));
+        save([savedir 'time.mat'],'time_sel');
+    end
+end
+
+%% MULTICLASS PLOTTING
+
+datadir = '/scratch7/MINDLAB2017_MEG-LearningBach/Leonardo/PhDThesis/Paper1/Decoding/ProperLowPassContinuousData_40Hz/Revision_II_NeuroImage_multiclass_f/';
+datadir = '/scratch7/MINDLAB2017_MEG-LearningBach/Leonardo/PhDThesis/Paper1/Decoding/Lowpass_40Hz/Revision_II_NeuroImage_multiclass/';
+%loading and reshpaping data outputted by AU server (SVM algorithm) for statistics
+load([datadir 'time.mat']);
+%loading data
+dd1 = zeros(length(time_sel),2,2,71);
+cnt = 0;
+for ii = 1:71
+    if ii ~= 39 %number 39 is simply a non-existent subject, however for computational reasons we decided to not update the ID of all other subjects and we preferred to simply leave this subject empty and ignore it in the computations
+        cnt = cnt + 1;
+        load([datadir 'PD_SUBJ' num2str(ii) '.mat']);
+        dd1(:,:,:,cnt) = d.d;
+    end
+    disp(ii)
+end
+dd2 = mean(dd1,4); %average over participants
+%plotting the time-series of the confusion matrix
+figure
+plot(time_sel,dd2(:,1,1),'DisplayName','Aold-Pold')
+hold on
+plot(time_sel,dd2(:,1,2),'DisplayName','Aold-Pnew')
+hold on
+plot(time_sel,dd2(:,2,1),'DisplayName','Anew-Pold')
+hold on
+plot(time_sel,dd2(:,2,2),'DisplayName','Anew-Pnew')
+legend('show')
+grid minor
+xlim([time_sel(1) time_sel(end)])
+set(gcf,'Color','w')
+
+%% PAIRWISE DECODING PLOTTING
+
+datadir = '/scratch7/MINDLAB2017_MEG-LearningBach/Leonardo/PhDThesis/Paper1/Decoding/Lowpass_40Hz/Revision_II_NeuroImage_nolowpass_pairwise/';
+datadir = '/scratch7/MINDLAB2017_MEG-LearningBach/Leonardo/PhDThesis/Paper1/Decoding/ProperLowPassContinuousData_40Hz/Revision_II_NeuroImage_nolowpass_pairwise_f/';
+%loading and reshpaping data outputted by AU server (SVM algorithm) for statistics
+load([datadir 'time.mat']);
+%loading data
+dd1 = zeros(length(time_sel),71);
+cnt = 0;
+for ii = 1:71
+    if ii ~= 39 %number 39 is simply a non-existent subject, however for computational reasons we decided to not update the ID of all other subjects and we preferred to simply leave this subject empty and ignore it in the computations
+        cnt = cnt + 1;
+        load([datadir 'PD_SUBJ' num2str(ii) '.mat']);
+        dd1(:,cnt) = d.d;
+    end
+    disp(ii)
+end
+dd2 = mean(dd1,2); %average over participants
+%plotting the time-series of the confusion matrix
+figure
+plot(time_sel,dd2(:,1,1),'DisplayName','Decoding')
+legend('show')
+grid minor
+xlim([time_sel(1) time_sel(end)])
+set(gcf,'Color','w')
+
+%%
