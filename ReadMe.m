@@ -2,14 +2,27 @@
 
 % CITATION
 % If you find LBPD functions useful, please cite the following paper(s):
-% 1) https://www.biorxiv.org/content/10.1101/2020.06.23.165191v3.full
+% 1) Spatiotemporal whole-brain dynamics of auditory patterns recognition
+%    L. Bonetti, E. Brattico, F. Carlomagno, J. Cabral, A. Stevner, G. Deco, P.C. Whybrow, M. Pearce, D. Pantazis, P. Vuust, M.L Kringelbach
+%    https://www.biorxiv.org/content/10.1101/2020.06.23.165191v3.full
 % 2) Bonetti, L., Brattico, E., Carlomagno, F., Donati, G., Cabral, J., Haumann, N. T., ... & Kringelbach, M. L. (2021).
 %    Rapid encoding of musical tones discovered in whole-brain connectivity. NeuroImage, 118735.
 %    https://www.sciencedirect.com/science/article/pii/S1053811921010077
-% 3) https://www.biorxiv.org/content/10.1101/2021.10.14.464389v1
+% 3) Temporal pattern recognition in the human brain: a dual simultaneous processing
+%    L. Bonetti, E. Brattico, S.E.P. Bruzzone, G. Donati, G. Deco, D. Pantazis, P. Vuust, M.L. Kringelbach
+%    https://www.biorxiv.org/content/10.1101/2021.10.21.465263v1
 % 4) Bruzzone, S.E.P., Lumaca, M., Brattico, E., Vuust, P., Kringelbach, M.L., Bonetti, L. (2022).
 %    Dissociated brain functional connectivity of fast versus slow frequencies underlying individual differences in fluid intelligence: a DTI and MEG study. Scientific Reports, 12, 4746.
 %    https://www.nature.com/articles/s41598-022-08521-5
+% 5) Whole-brain computation of cognitive versus acoustic errors in music
+%    L. Bonetti, F. Carlomagno, M. Kliuchko, B.P. Gold, S. Palva, N.T. Haumann, M. Tervaniemi, M. Huotilainen, P. Vuust, E. Brattico
+%    https://www.biorxiv.org/content/10.1101/2022.05.17.492262v1
+% 6) Associations between abstract working memory abilities and brain activity underlying long-term recognition of auditory sequences
+%    G. Fernández Rubio, F. Carlomagno, P. Vuust, M. L. Kringelbach, L. Bonetti
+%    https://www.biorxiv.org/content/10.1101/2022.05.19.492607v1
+% 7) The spatiotemporal dynamics of recognition memory for complex versus simple auditory sequences
+%    G. Fernández Rubio, E. Brattico, S. A. Kotz, M. L. Kringelbach, P. Vuust, L. Bonetti
+%    https://www.biorxiv.org/content/10.1101/2022.05.15.492038v1
 
 % INTRODUCTION TO LBPD
 % LBPD is a collection of functions for MEG brain activity and connectivity
@@ -130,6 +143,7 @@
 % 38)FunctionalSpatialClustering_voxels2ROIs_LBPD_D
 % 39)STC_plottingtimeseries_LBPD
 % 40)MEG_SR_Stats_twogroups_LBPD
+% 41)Extract_BrainCluster_Information_3D_LBPD_D
 
 % Additional scripts:
 % - Workbench_Codes_LocalMac_Example
