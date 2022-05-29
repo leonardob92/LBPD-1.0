@@ -24,6 +24,9 @@
 %    G. Fernández Rubio, E. Brattico, S. A. Kotz, M. L. Kringelbach, P. Vuust, L. Bonetti
 %    https://www.biorxiv.org/content/10.1101/2022.05.15.492038v1
 
+% The pipeline used in the above referenced studies can be found in the folder: "LeadingScripts"
+
+
 % INTRODUCTION TO LBPD
 % LBPD is a collection of functions for MEG brain activity and connectivity
 % data analysis.
@@ -81,7 +84,7 @@
 % Then, please copy FieldTrip and SPM in the directory: 'yourpath/LBPD/External/',
 % To start LBPD up, you only need to run the 'LBPD_startup_D' function
 % (and use only the functions that do not explicitely require OSL).
-% A special acknowledgment must be made also for the codes developed by
+% A special acknowledgment must be made for the codes developed by
 % Dimitrios Pantazis that, even if not directly connected to LBPD
 % functions, have been employed in the attached Leading Script(s) and can be
 % used to understand the results of the following study:
