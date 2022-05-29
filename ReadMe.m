@@ -56,7 +56,7 @@
 % or (at your option) any later version.
 
 % leonardo.bonetti@clin.au.dk, Leonardo Bonetti, Aarhus, DK, 27/05/2021
-% leonardo.bonetti@psych.ox.ac.uk
+% leonardo.bonetti@psych.ox.ac.uk, Leonardo Bonetti, Oxford, UK, 29/05/2022
 
 
 % EXTERNAL FUNCTIONS
