@@ -1,4 +1,4 @@
-function [ sign_clust ] = oneD_MCS_LBPD_D( P, p, max_lab, permnum, MCS_thresh )
+function [ sign_clust ] = oneD_MCS_LBPD_D( P, p, max_lab, permnum, MCS_thresh, time )
 
 % One-dimensional (1D) Monte Carlo simulation.
 % It calculates whether a cluster of significant values in 1 dimension (for
@@ -36,6 +36,8 @@ function [ sign_clust ] = oneD_MCS_LBPD_D( P, p, max_lab, permnum, MCS_thresh )
 %                        built on length of all clusters of each permutation
 %           -permnum:    number of permutations
 %           -MCS_thresh: threshold for MCS (e.g. .001)
+%           -time:       time in seconds to get a better output (in seconds instead than in time-points)
+%                        Leave empty [] or do not provide it to output time-samples (instead of seconds)  
 
 % OUTPUT:   -sign_clust: clusters of P that survived the Monte Carlo
 %                        simulation (1st column: cluster size, 2nd column: p-value, 3th column: temporal extent of original cluster)
@@ -83,7 +85,7 @@ for ii = 1:permnum
     else
         r2 = r; %otherwise just passing r to r2..
     end
-    CC = bwconncomp(r2);  %function for getting the 'islands'
+    CC = bwconncomp(r2); %function for getting the 'islands'
     if max_lab == 1
         rclusters = cat(1,rclusters,max(cellfun('length',CC.PixelIdxList))); %getting the maximum value of the simulated (randomized) cluster lengths
     else
@@ -96,7 +98,16 @@ so2 = sort(rclusters,'descend');
 for ii = 1:length(so)
     ab = find(so(ii)==so2); %finding where the original ii cluster size is located in the distribution of sizes of randomized data
     sign_clust(ii,1) = {so(ii)}; %storing original ii cluster size
-    sign_clust(ii,3) = tclusters(io(ii)); %storing temporal extent of original ii cluster
+    if exist('time','var')
+        if ~isempty(time)
+            dummm = tclusters{io(ii)}; %extracting significant time-samples
+            sign_clust{ii,3} = [time(dummm(1)) time(dummm(end))]; %storing time extremes (in seconds) of significant cluster
+        else
+            sign_clust(ii,3) = tclusters(io(ii)); %storing temporal extent of original ii cluster
+        end
+    else
+        sign_clust(ii,3) = tclusters(io(ii)); %storing temporal extent of original ii cluster
+    end
     if ~isempty(ab)
         sign_clust(ii,2) = {ab(end)/length(rclusters)}; %storing p-value after Monte Carlo simulation
     else
