@@ -24,7 +24,7 @@
 %    G. Fernández Rubio, E. Brattico, S. A. Kotz, M. L. Kringelbach, P. Vuust, L. Bonetti
 %    https://www.biorxiv.org/content/10.1101/2022.05.15.492038v1
 
-% The pipeline used in the above referenced studies can be found in the folder: "LeadingScripts"
+% The pipelines used in the above referenced studies can be found in the folder: "LeadingScripts".
 
 
 % INTRODUCTION TO LBPD
