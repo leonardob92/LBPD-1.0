@@ -150,6 +150,8 @@
 % 41)Extract_BrainCluster_Information_3D_LBPD_D
 % 42)InducedResponses_Morlet_ROIs_LBPD_D
 % 43)InducedResponses_Morlet_Coords_AALROIs_LBPD_D
+% 44)FromCoordMatrix_2_3DNifti_8mm_LBPD_D
+% 45)From3DNifti_OrMNICoords_2_CoordMatrix_8mm_LBPD_D
 
 % Additional scripts:
 % - Workbench_Codes_LocalMac_Example
