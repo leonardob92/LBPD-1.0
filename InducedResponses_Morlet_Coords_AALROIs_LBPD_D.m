@@ -65,9 +65,46 @@ if ~isempty(coordd)
     load('/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External/MNI152_8mm_coord_dyi.mat');
     idx = zeros(size(coordd,1),1);
     for ii = 1:size(coordd,1) %over voxels
+        %previous
+%         dum1 = double(coordd(ii,1) == MNI8(:,1)); %x
+%         dum2 = double(coordd(ii,2) == MNI8(:,2)); %y
+%         dum3 = double(coordd(ii,3) == MNI8(:,3)); %z
+%         a = find((dum1+dum2+dum3)==3); %index
+%         idx(ii) = a; %storing index   
+        %updated
+        %x
         dum1 = double(coordd(ii,1) == MNI8(:,1)); %x
+        if isempty(find(dum1==1)) %if there is no pefect correspondance between given coordinate and mask coordinate, you look for an approximation
+            dum = coordd(ii,1) - MNI8(:,1); %differnce between given coordinate and mask coordinate
+            [m1] = min(dum(dum>0)); %getting closest value to 0 (positive)
+            [m2] = max(dum(dum<0)); %getting closest value to 0 (negative)
+            asd = [m1 m2]; %concatenating the values
+            [~,i] = min(abs([m1 m2])); %getting the minimum value n absolute terms
+            dum1 = zeros(size(MNI8,1),1);
+            dum1(asd(i)==dum) = 1; %assigning 1 to the requested voxels (the ones that are closest to the given coordinate)
+        end
+        %y
         dum2 = double(coordd(ii,2) == MNI8(:,2)); %y
+        if isempty(find(dum2==1)) %if there is no pefect correspondance between given coordinate and mask coordinate, you look for an approximation
+            dum = coordd(ii,2) - MNI8(:,2); %differnce between given coordinate and mask coordinate
+            [m1] = min(dum(dum>0)); %getting closest value to 0 (positive)
+            [m2] = max(dum(dum<0)); %getting closest value to 0 (negative)
+            asd = [m1 m2]; %concatenating the values
+            [~,i] = min(abs([m1 m2])); %getting the minimum value n absolute terms
+            dum2 = zeros(size(MNI8,1),1);
+            dum2(asd(i)==dum) = 1; %assigning 1 to the requested voxels (the ones that are closest to the given coordinate)
+        end
+        %z
         dum3 = double(coordd(ii,3) == MNI8(:,3)); %z
+        if isempty(find(dum3==1)) %if there is no pefect correspondance between given coordinate and mask coordinate, you look for an approximation
+            dum = coordd(ii,3) - MNI8(:,3); %differnce between given coordinate and mask coordinate
+            [m1] = min(dum(dum>0)); %getting closest value to 0 (positive)
+            [m2] = max(dum(dum<0)); %getting closest value to 0 (negative)
+            asd = [m1 m2]; %concatenating the values
+            [~,i] = min(abs([m1 m2])); %getting the minimum value n absolute terms
+            dum3 = zeros(size(MNI8,1),1);
+            dum3(asd(i)==dum) = 1; %assigning 1 to the requested voxels (the ones that are closest to the given coordinate)
+        end
         a = find((dum1+dum2+dum3)==3); %index
         idx(ii) = a; %storing index
     end
