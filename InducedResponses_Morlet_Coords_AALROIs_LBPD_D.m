@@ -124,7 +124,7 @@ end
 %loading data and computing time-frequency analysis
 load([list(1).folder '/' list(1).name]);
 ttt = length(OUT.S.inversion.timef);
-P2 = zeros(length(idx),length(f),ttt,2,length(list));
+P2 = zeros(length(idx),length(f),ttt,length(conds),length(list));
 for ii = 1:length(list)
     disp(['loading data for subject ' num2str(ii)])
     if ii ~= 1
