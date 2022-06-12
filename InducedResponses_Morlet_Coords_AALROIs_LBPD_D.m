@@ -21,6 +21,9 @@ O = [];
 %           -S.conds:             indices of experimental conditions to be used (in connection to LBPD source reconstruction
 %           -S.coordd:            vector (n of voxels x 3 (x,y,z in MNI space)) with coordinates to be used.
 %                                 Leave empty [] if you want to use a full ALL ROI(s).
+%           -S.Aarhus_clust:      0 = working locally
+%                                 integer number (i.e. 1) = sending one job for each subject to the Aarhus cluster (the number you insert
+%                                 here corresponds to the slots of memory that you allocate for each job.
 %           -S.subjlist:          list of subjects (output of LBPD source reconstruction) provided as the output of the "dir" Matlab function
 %           -S.time:              vector of time in seconds (it assumes the source reconstructed data has the same time.
 %           -S.outdir:            path and name (without ".mat") to store the results
@@ -122,37 +125,53 @@ else
     idx(idx==0) = []; %removing the few voxels that couldn't be indexed since the AAL ROIs and the mask used slightly different approximations and therefore a few voxels do not perfectly correspond (with MEG spatial resolution it does not really matter)
 end
 %loading data and computing time-frequency analysis
-load([list(1).folder '/' list(1).name]);
-ttt = length(OUT.S.inversion.timef);
-P2 = zeros(length(idx),length(f),ttt,length(conds),length(list));
-for ii = 1:length(list)
-    disp(['loading data for subject ' num2str(ii)])
-    if ii ~= 1
-        load([list(ii).folder '/' list(ii).name]);
-    end
-    for jj = 1:length(conds) %over conditions
-        disp(['subj ' num2str(ii) ' - cond ' num2str(jj)])
-        if average_trials ~= 1
-            dum = OUT.sources_ERFs{conds(jj)}; %getting single trial data for Old correct
-            P = zeros(length(idx),length(f),ttt,size(dum,3));
-            for xx = 1:size(dum,3) %over trials
-                data = dum(idx,:,xx);
-                P(:,:,:,xx) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
-            end
-            P2(:,:,:,jj,ii) = mean(P,4); %average over trials
-            
-        else
-            data = OUT.sources_ERFs(idx,:,conds(jj));
-            P2(:,:,:,jj,ii) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
-        end
-    end
-    clear OUT dum P
-end
-time = time(1:ttt);
-if average_trials ~= 1
-    save([S.outdir '_avetr0.mat'],'P2','time','f','S');
+if S.Aarhus_clust == 0
+    load([list(1).folder '/' list(1).name]);
+    ttt = length(OUT.S.inversion.timef);
+    P2 = zeros(length(idx),length(f),ttt,length(conds),length(list));
 else
-    save([S.outdir '_avetr1.mat'],'P2','time','f','S');
+    %setting up the cluster
+    addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/Cluster_ParallelComputing') %add the path to the function that submits the jobs to the cluster
+    clusterconfig('scheduler', 'cluster'); % 'none' or 'cluster'
+    clusterconfig('long_running', 1); %there are different queues for the cluster depending on the number and length of the jobs you want to submit
+    clusterconfig('slot', S.Aarhus_clust); %slot in the queu
+    S.idx = idx;
+end
+for ii = 1:length(list)
+    if S.Aarhus_clust == 0
+        disp(['loading data for subject ' num2str(ii)])
+        if ii ~= 1
+            load([list(ii).folder '/' list(ii).name]);
+        end
+        for jj = 1:length(conds) %over conditions
+            disp(['subj ' num2str(ii) ' - cond ' num2str(jj)])
+            if average_trials ~= 1
+                dum = OUT.sources_ERFs{conds(jj)}; %getting single trial data for Old correct
+                P = zeros(length(idx),length(f),ttt,size(dum,3));
+                for xx = 1:size(dum,3) %over trials
+                    data = dum(idx,:,xx);
+                    P(:,:,:,xx) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+                end
+                P2(:,:,:,jj,ii) = mean(P,4); %average over trials
+                
+            else
+                data = OUT.sources_ERFs(idx,:,conds(jj));
+                P2(:,:,:,jj,ii) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+            end
+        end
+        clear OUT dum P
+    else
+        S.ii = ii;
+        jobid = job2cluster(@Induced_Resp_SingleSub_AAL_Coordsj_AarhusClust,S);
+    end
+end
+if S.Aarhus_clust == 0
+    time = time(1:ttt);
+    if average_trials ~= 1
+        save([S.outdir '_avetr0.mat'],'P2','time','f','S');
+    else
+        save([S.outdir '_avetr1.mat'],'P2','time','f','S');
+    end
 end
 
 

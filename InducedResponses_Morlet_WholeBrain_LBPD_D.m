@@ -10,6 +10,8 @@ O = [];
 % reconstructed data).
 % This function can work locally on any computer, but it was conceived for
 % the cluster of computer of Aarhus University.
+% THIS FUNCTION SHOULD BE USED ONLY IF YOU HAVE A VERY LARGE COMPUTATIONAL
+% POWER..
 
 
 
@@ -58,7 +60,7 @@ if S.Aarhus_clust == 1
     addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/Cluster_ParallelComputing') %add the path to the function that submits the jobs to the cluster
     clusterconfig('scheduler', 'cluster'); % 'none' or 'cluster'
     clusterconfig('long_running', 1); %there are different queues for the cluster depending on the number and length of the jobs you want to submit
-    clusterconfig('slot', 3); %slot in the queu
+    clusterconfig('slot', 7); %slot in the queu; 7 is not even enough, so maybe it is not a great idea to compute it for the whole-brain..
     addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/Cluster_ParallelComputing')
 end
 for ii = 1:length(list)
