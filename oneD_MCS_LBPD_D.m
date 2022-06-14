@@ -1,4 +1,4 @@
-function [ sign_clust ] = oneD_MCS_LBPD_D( P, p, max_lab, permnum, MCS_thresh, time )
+function [ sign_clust ] = oneD_MCS_LBPD_D( P, p, max_lab, permnum, MCS_thresh, time, tvals )
 
 % One-dimensional (1D) Monte Carlo simulation.
 % It calculates whether a cluster of significant values in 1 dimension (for
@@ -38,6 +38,7 @@ function [ sign_clust ] = oneD_MCS_LBPD_D( P, p, max_lab, permnum, MCS_thresh, t
 %           -MCS_thresh: threshold for MCS (e.g. .001)
 %           -time:       time in seconds to get a better output (in seconds instead than in time-points)
 %                        Leave empty [] or do not provide it to output time-samples (instead of seconds)  
+%           -tvals:      vector with t-values (or other statistical parameter that you wish to report in the output)
 
 % OUTPUT:   -sign_clust: clusters of P that survived the Monte Carlo
 %                        simulation (1st column: cluster size, 2nd column: p-value, 3th column: temporal extent of original cluster)
@@ -72,7 +73,7 @@ end
 CCt = bwconncomp(dummyt); %getting the 'islands'
 tclusters = CCt.PixelIdxList; %clusters of 'islands'
 [so,io] = sort(cellfun('length',tclusters),'descend'); %sorting and getting indexes
-sign_clust = cell(length(so'),3);
+sign_clust = cell(length(so'),4);
 % sign_clust(:,1) = so';
 
 rclusters = [];
@@ -108,6 +109,9 @@ for ii = 1:length(so)
     else
         sign_clust(ii,3) = tclusters(io(ii)); %storing temporal extent of original ii cluster
     end
+    dumtt = tvals(dummm(1):dummm(end)); %extracting t-values in the significant time-range
+    [~,idX] = max(abs(dumtt)); %getting index of maximum t-value (in absolute strength since the contrast may return stronger negative values if cond 2 is > cond 1)
+    sign_clust(ii,4) = {dumtt(idX)}; %getting greatest t-value
     if ~isempty(ab)
         sign_clust(ii,2) = {ab(end)/length(rclusters)}; %storing p-value after Monte Carlo simulation
     else
@@ -120,7 +124,6 @@ for ii = 1:length(so)
             sign_clust(ii,2) = {olp/length(so2)}; %and then calculate the p-value by dividing that index by the length of dummysort
         end
     end
-    
     if sign_clust{ii,2} >= MCS_thresh %if the p-value after MCS is equal or higher than the MCS threshold
         sign_clust(ii,2) = {[]}; %deleting p-value
     end
