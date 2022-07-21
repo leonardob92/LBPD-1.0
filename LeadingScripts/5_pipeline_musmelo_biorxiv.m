@@ -363,8 +363,9 @@ S.outdir = outdir;
 % S.spm_list = spm_list;
 S.data = [];
 if load_data == 1 %if you already computed and saved on disk the t-tests you can load them here
-%      load([outdir '/sensor_data_nostandard.mat']);
-     load([outdir '/sensor_data_jan2021.mat']);
+     load([outdir '/sensor_data_nostandard2.mat']);
+     data_mat = PD;
+%      load([outdir '/sensor_data_jan2021.mat']);
       
 %     load([outdir '/sensor_data_also_uncorrect.mat']);
     S.data = data_mat;
@@ -380,24 +381,33 @@ else %otherwise you can extract the data from SPM MEEG objects (one for each sub
 end
 % S.conditions = {'Old_Correct','New_Correct','Old_Uncorrect','New_Uncorrect'};
 % S.conditions = {'Standard','melody mod','rhythm mod','transposition','mistuning','timbre deviant','rhythm mistake' };
-% S.conditions = {'melody mod','rhythm mod','transposition','mistuning','timbre deviant','rhythm mistake' };
-S.conditions = {'Standard_mr','melody mod','rhythm mod','transposition','mistuning','timbre deviant','rhythm mistake','Standard_t','Standard_m','Standard_tr'};
+S.conditions = {'melody mod','rhythm mod','transposition','mistuning','timbre deviant','rhythm mistake' };
+% S.conditions = {'Standard_mr','melody mod','rhythm mod','transposition','mistuning','timbre deviant','rhythm mistake','Standard_t','Standard_m','Standard_tr'};
+%assigning colors
+color_line = colormap(lines(6)); %extracting some colours from a colormap
+cl2 = color_line;
+cl2(2,:) = color_line(1,:);
+cl2(1,:) = color_line(2,:);
+cl2(4,:) = color_line(3,:);
+cl2(3,:) = color_line(4,:);
+cl2(5,:) = [0 0.7 0];
+S.color_line = cl2;
 
 % S.timeextract = [286:751]; %time-points to be extracted
 S.timeextract = []; %time-points to be extracted
 S.centerdata0 = 0; %1 to make data starting at 0
-S.save_data = 1; %only meaningfull if you read data from SPM objects saved on disk
+S.save_data = 0; %only meaningfull if you read data from SPM objects saved on disk
 % S.save_name_data = 'sensor_data';
 %S.save_name_data = 'sensor_data_jan2021';
 % S.save_name_data = 'sensor_data_lowpass3Hz_shortbaseline';
 %individual waveform plotting
-S.waveform_singlechannels_label = 1; %1 to plot single channel waveforms
+S.waveform_singlechannels_label = 0; %1 to plot single channel waveforms
 S.wave_plot_conditions_together = 0; %1 for plotting the average of all
 S.mag_lab = 1; %1 for magnetometers; 2 for gradiometers
 S.x_lim_temp_wave = []; %limits for time (in secs) (E.g. [-0.1 3.4])
 S.y_lim_ampl_wave = []; %limit for amplitude (E.g. [0 120] magnetometes, [0 6] gradiometers)
 %averaged waveform plotting
-S.waveform_average_label = 0;
+S.waveform_average_label = 1;
 % S.left_mag = [2:2:204];
 S.legc = 1; %set 1 for legend
 
@@ -408,11 +418,11 @@ S.avewave_contrast = 0; %1 to plot the contrast between conditions (averaged wav
 S.save_label_waveaverage = 0;
 S.label_plot = 'block_minor';
 %t-tests
-S.t_test_for_permutations = 1;
+S.t_test_for_permutations = 0;
 S.cond_ttests_tobeplotted_topoplot = [2 1]; %this is for both topoplot and t-tests!! (here [1 2] means cond1 vs cond2!!!!!!!)
 %topoplotting
 S.xlim = [0.12 0.13]; %time topolot (cluster II)
-S.topoplot_label = 1;
+S.topoplot_label = 0;
 S.fieldtrip_mask = '/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External';
 S.topocontr = 1;
 S.topocondsing = [4];
@@ -466,7 +476,7 @@ D1 = data_mat;
 PD = zeros(size(data_mat,1),size(data_mat,2),size(data_mat,3),size(data_mat,4)-4);
 v = [1 1 8 9 10 10];
 for ii = 1:6
-PD(:,:,:,ii) = D1(:,:,:,ii+1) - D1(:,:,:,v(ii));
+    PD(:,:,:,ii) = D1(:,:,:,ii+1) - D1(:,:,:,v(ii));
 end
 save('sensor_data_nostandard2','PD')
 
