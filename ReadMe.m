@@ -8,9 +8,10 @@
 % 2) Bonetti, L., Brattico, E., Carlomagno, F., Donati, G., Cabral, J., Haumann, N. T., ... & Kringelbach, M. L. (2021).
 %    Rapid encoding of musical tones discovered in whole-brain connectivity. NeuroImage, 118735.
 %    https://www.sciencedirect.com/science/article/pii/S1053811921010077
-% 3) Temporal pattern recognition in the human brain: a dual simultaneous processing
+% 3) Brain recognition of previously learned versus novel temporal sequences: a differential simultaneous processing. Cerebral Cortex (2022).
 %    L. Bonetti, E. Brattico, S.E.P. Bruzzone, G. Donati, G. Deco, D. Pantazis, P. Vuust, M.L. Kringelbach
 %    https://www.biorxiv.org/content/10.1101/2021.10.21.465263v1
+%    https://github.com/leonardob92/Brain_Recognition_Temporal_Sequences_Differential_Simultaneous_Processing_Cerebral_Cortex.git
 % 4) Bruzzone, S.E.P., Lumaca, M., Brattico, E., Vuust, P., Kringelbach, M.L., Bonetti, L. (2022).
 %    Dissociated brain functional connectivity of fast versus slow frequencies underlying individual differences in fluid intelligence: a DTI and MEG study. Scientific Reports, 12, 4746.
 %    https://www.nature.com/articles/s41598-022-08521-5
