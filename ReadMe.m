@@ -25,6 +25,7 @@
 %    https://github.com/gemmaferu/MEG-auditory-memory/blob/main/papers/Associations_WM_long-term_recognition_auditory_sequences.m
 % 7) The spatiotemporal dynamics of recognition memory for complex versus simple auditory sequences
 %    G. Fernández Rubio, E. Brattico, S. A. Kotz, M. L. Kringelbach, P. Vuust, L. Bonetti
+%    Communications Biology (in press)
 %    https://www.biorxiv.org/content/10.1101/2022.05.15.492038v1
 
 % The pipelines used in the above referenced studies can be found in the folder: "LeadingScripts".
