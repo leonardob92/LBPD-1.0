@@ -20,7 +20,8 @@
 %    https://www.biorxiv.org/content/10.1101/2022.05.17.492262v1
 % 6) Associations between abstract working memory abilities and brain activity underlying long-term recognition of auditory sequences
 %    G. Fernández Rubio, F. Carlomagno, P. Vuust, M. L. Kringelbach, L. Bonetti
-%    https://www.biorxiv.org/content/10.1101/2022.05.19.492607v1
+%    PNAS Nexus, Volume 1, Issue 4, September 2022, pgac216,
+%    https://doi.org/10.1093/pnasnexus/pgac216
 %    https://github.com/gemmaferu/MEG-auditory-memory/blob/main/papers/Associations_WM_long-term_recognition_auditory_sequences.m
 % 7) The spatiotemporal dynamics of recognition memory for complex versus simple auditory sequences
 %    G. Fernández Rubio, E. Brattico, S. A. Kotz, M. L. Kringelbach, P. Vuust, L. Bonetti
