@@ -15,9 +15,10 @@
 % 4) Bruzzone, S.E.P., Lumaca, M., Brattico, E., Vuust, P., Kringelbach, M.L., Bonetti, L. (2022).
 %    Dissociated brain functional connectivity of fast versus slow frequencies underlying individual differences in fluid intelligence: a DTI and MEG study. Scientific Reports, 12, 4746.
 %    https://www.nature.com/articles/s41598-022-08521-5
-% 5) Whole-brain computation of cognitive versus acoustic errors in music
+% 5) Whole-brain computation of cognitive versus acoustic errors in music: A mismatch negativity study
 %    L. Bonetti, F. Carlomagno, M. Kliuchko, B.P. Gold, S. Palva, N.T. Haumann, M. Tervaniemi, M. Huotilainen, P. Vuust, E. Brattico
-%    https://www.biorxiv.org/content/10.1101/2022.05.17.492262v1
+%    NeuroImage: Reports
+%    https://github.com/leonardob92/Whole_brain_computation_of_cognitive_vs_acoustic_errors_in_music_NeuroImageReports.git
 % 6) Associations between abstract working memory abilities and brain activity underlying long-term recognition of auditory sequences
 %    G. Fernández Rubio, F. Carlomagno, P. Vuust, M. L. Kringelbach, L. Bonetti
 %    PNAS Nexus, Volume 1, Issue 4, September 2022, pgac216,
