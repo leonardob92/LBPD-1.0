@@ -73,8 +73,10 @@ function [ OUT ] = MEG_sensors_plotting_ttest_LBPD_D2( S )
 
 % -1)individual waveform plotting
 %   -S.waveform_singlechannels_label:    1 to plot single channel waveforms
-%   -S.wave_plot_conditions_together:    1 for plotting the average of all
-%                                        conditions
+%   -S.wave_plot_conditions_together:    1 for plotting the average of some or all conditions
+%   -S.ave_cond:                         cell array with vectors of indices of conditions to be averaged and then plotted.
+%                                        e.g. {[1,3],[2,4,5],[6]} to average 1 and 3, and then 2, 4 and 5, and then only 6 and plot them again each other
+%                                        Leave it empty {[]} if you want to average all conditions together
 %   -S.mag_lab:                          1 for magnetometers
 %                                        2 for gradiometers
 %   -S.x_lim_temp_wave:                  limits for time (in secs)
@@ -281,6 +283,9 @@ cond_n = length(conds); %get the number of conditions
 %assigning colors for plotting by default if not differently specified by the user..
 if ~isfield(S,'color_line')
     color_line = colormap(lines(cond_n)); %extracting some colours from a colormap
+    if cond_n > 4 %assignining black if you have more than 4 conditions (to avoid green, for colorblind people)
+        color_line(5,:) = [0 0 0];
+    end
 else
     color_line = S.color_line;
 end
@@ -499,9 +504,21 @@ if S.waveform_average_label == 1
 %     stde_right_mag = squeeze(std(squeeze(mean(mat_right_mag,1)),0,2)/sqrt(Sz(3)));
     %if you want to plot the average over conditions
     if S.wave_plot_conditions_together == 1
-        mean_left_mag = nanmean(mean_left_mag,2);
-%         mean_right_mag = mean(mean_right_mag,2);
-        stde_left_mag = nanmean(stde_left_mag,2);
+        if ~isempty(S.ave_cond)
+            mean_left_mag2 = zeros(size(mean_left_mag,1),length(S.ave_cond));
+            stde_left_mag2 = zeros(size(stde_left_mag,1),length(S.ave_cond));
+            for qq = 1:length(S.ave_cond)
+                mean_left_mag2(:,qq) = nanmean(mean_left_mag(:,S.ave_cond{qq}),2);
+                stde_left_mag2(:,qq) = nanmean(stde_left_mag(:,S.ave_cond{qq}),2);
+            end
+            mean_left_mag = mean_left_mag2;
+            %         mean_right_mag = mean(mean_right_mag,2);
+            stde_left_mag = stde_left_mag2;
+        else
+            mean_left_mag = nanmean(mean_left_mag,2);
+            %         mean_right_mag = mean(mean_right_mag,2);
+            stde_left_mag = nanmean(stde_left_mag,2);
+        end
 %         stde_right_mag = mean(stde_right_mag,2);
         plotlab = 'avg conditions';
         cond_n = 1; %and therefore the number of conditions becomes one
@@ -513,7 +530,7 @@ if S.waveform_average_label == 1
 %     clf(figure(13))
 %     figure(13)
     figure
-    thc = ones(cond_n)*2;
+    thc = ones(cond_n)*2.5;
 %     %%% hard coding.. just for one specific purpose.. not for more general
 %     %%% ones..
 %     color_line = {'b','r','b','r'};
@@ -533,13 +550,13 @@ if S.waveform_average_label == 1
             ylim(y_lim_ampl);
         end
         hold on
-        plot(time_sel,mean_left_mag(:,aa) + stde_left_mag(:,aa),':','Color',color_line(aa,:),'LineWidth',0.5); %upper std error
+        plot(time_sel,mean_left_mag(:,aa) + stde_left_mag(:,aa),':','Color',color_line(aa,:),'LineWidth',1.5); %upper std error
         xlim(x_lim_temp);
         if ~isempty(y_lim_ampl)
             ylim(y_lim_ampl);
         end
         hold on
-        plot(time_sel,mean_left_mag(:,aa) - stde_left_mag(:,aa),':','Color',color_line(aa,:),'LineWidth',0.5); %lower std error
+        plot(time_sel,mean_left_mag(:,aa) - stde_left_mag(:,aa),':','Color',color_line(aa,:),'LineWidth',1.5); %lower std error
         xlim(x_lim_temp);
         if ~isempty(y_lim_ampl)
             ylim(y_lim_ampl);
@@ -578,13 +595,13 @@ if S.waveform_average_label == 1
                 ylim(y_lim_ampl);
             end
             hold on
-            plot(time_sel,mean_left_mag(:,aa) + stde_left_mag(:,aa),':','Color',color_line(aa,:),'LineWidth',0.5); %upper std error
+            plot(time_sel,mean_left_mag(:,aa) + stde_left_mag(:,aa),':','Color',color_line(aa,:),'LineWidth',1.5); %upper std error
             xlim(x_lim_temp);
             if ~isempty(y_lim_ampl)
                 ylim(y_lim_ampl);
             end
             hold on
-            plot(time_sel,mean_left_mag(:,aa) - stde_left_mag(:,aa),':','Color',color_line(aa,:),'LineWidth',0.5); %lower std error
+            plot(time_sel,mean_left_mag(:,aa) - stde_left_mag(:,aa),':','Color',color_line(aa,:),'LineWidth',1.5); %lower std error
             xlim(x_lim_temp);
             if ~isempty(y_lim_ampl)
                 ylim(y_lim_ampl);
