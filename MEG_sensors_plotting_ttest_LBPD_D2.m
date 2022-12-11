@@ -112,6 +112,8 @@ function [ OUT ] = MEG_sensors_plotting_ttest_LBPD_D2( S )
 
 % -ttests settings
 %   -S.t_test_for_permutations:          1 to compute univariate t-tests for each channel and time-point.
+%   -S.magabs:                           1 to do absolute values for magnetometers before computing the t-tests.
+%                                        0 (or not writing the field) for computing t-tests on double-polarity magnetometers.
 %   -S.cond_ttests_tobeplotted_topoplot: conditions to be contrasted and then plotted in the
 %                                        topoplot and averaged waveform difference between conditions.
 %                                        E.g. [2 1] contrasts cond2 against cond1.
@@ -386,6 +388,12 @@ if S.t_test_for_permutations == 1
     Sz = size(data_mat);
     deftstat = zeros(Sz(1),Sz(2));
     deftstatp = zeros(Sz(1),Sz(2));
+    if isfield(S,'magabs') %in case you want the absolute values of magnetometers before computing the t-tests
+        if S.magabs == 1
+            dumdt = data_mat;
+            data_mat = abs(data_mat);
+        end
+    end
     for jsk = 1:Sz(1)
         disp(['calculating t-tests for channel ' num2str(jsk) ' / ' num2str(Sz(1))])
         for jsl = 1:Sz(2)
@@ -412,6 +420,11 @@ if S.t_test_for_permutations == 1
                 deftstat(jsk,jsl) = tstats.tstat;
                 deftstatp(jsk,jsl) = pttest;
             end
+        end
+    end
+    if isfield(S,'magabs') %back to magnetometers with double polarity for later plotting purposes
+        if S.magabs == 1
+            data_mat = dumdt;
         end
     end
     warning('now the MAGMEG and GRADMEG are being moved assuming that their original order is: MEG0111 - MEG0112+0113 - MEG0121 - MEG0122+0123 etc. as it is quite often.. CHECK if this applies to your case, otherwise just compute the t-tests yourself!')
