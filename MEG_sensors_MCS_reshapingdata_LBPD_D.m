@@ -1,4 +1,4 @@
-function [ MAG_data_pos, MAG_data_neg, GRAD_data ] = MEG_sensors_MCS_reshapingdata_LBPD_D( S )
+function [ MAG_data_pos, MAG_data_neg, GRAD_data, MAG_GRAD_tval ] = MEG_sensors_MCS_reshapingdata_LBPD_D( S )
 
 % It reshapes the order of data according to labels that are
 % submitted, providing 2D approximation of MEG sensors layout.
@@ -31,10 +31,13 @@ function [ MAG_data_pos, MAG_data_neg, GRAD_data ] = MEG_sensors_MCS_reshapingda
 %                             as the label (p-values of the NEGATIVE t-values)
 %           -S.TSTAT_grad:    same but for gradiometers data
 %           -S.raw_channels:  2D approximation of magnetometers MEG layout
+%           -S.TVal:          matrix with actual t-values (102 channels x time-points x sensor-type (first mag second combined planar grad)).
+%                             If you do not want to provide it, simply do not write the field.
 
 %  OUTPUT:  -MAG_data_pos:    reshaped POSITIVE magnetometers data
 %           -MAG_data_neg:    reshaped NEGATIVE magnetometers data
 %           -GRAD_data:       reshaped gradiometers data
+%           -MAG_GRAD_tval:   (if requested..), reshaped t-values for magnetometers (x,x,x,1) and gradiometers (x,x,x,2)
 
 
 
@@ -69,6 +72,12 @@ raw_channels = S.raw_channels;
 MAG_data_pos = zeros(rawmeg,colmeg,coltstat);
 MAG_data_neg = zeros(rawmeg,colmeg,coltstat);
 GRAD_data = zeros(rawmeg,colmeg,coltstat);
+if isfield(S,'TVal')
+    MAG_GRAD_tval = zeros(rawmeg,colmeg,coltstat,2);
+    Tval = S.TVal;
+else
+    MAG_GRAD_tval = [];
+end
 
 %actual reshaping
 for pp = 1:coltstat %iterates over time
@@ -79,6 +88,10 @@ for pp = 1:coltstat %iterates over time
                 MAG_data_pos(ii,jj,pp) = TSTAT_mag_pos(Inx,pp); %move the data (mag)
                 MAG_data_neg(ii,jj,pp) = TSTAT_mag_neg(Inx,pp); %move the data (mag)
                 GRAD_data(ii,jj,pp) = TSTAT_grad(Inx,pp); %move the data (grad)
+                if isfield(S,'TVal')
+                    MAG_GRAD_tval(ii,jj,pp,1) = Tval(Inx,pp,1); %move the data (mag tvals)
+                    MAG_GRAD_tval(ii,jj,pp,2) = Tval(Inx,pp,2); %move the data (grad tvals)
+                end
             end
         end
     end

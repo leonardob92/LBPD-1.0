@@ -27,31 +27,35 @@ function [ MAG_clust_pos, MAG_clust_neg, GRAD_clust ] = MEG_sensors_MonteCarlosi
 
 
 
-%  INPUT:   -S.data:        actual data (binarized p-values) (double).
-%                           Sensorhor x sensorvert x time x channeltype.
-%                           The 4th dimension must contain:
-%                           -1st: gradiometers (GRAD_data in the output of MEG_sensors_MCS_reshapingdata_LBPD_D.m)
-%                           -2nd: magnetometers positive (MAG_data_pos in the output of MEG_sensors_MCS_reshapingdata_LBPD_D.m)
-%                           -3th: magnetometers negative (MAG_data_neg in the output of MEG_sensors_MCS_reshapingdata_LBPD_D.m)
-%                           If you want to submit only gradiometers or
-%                           magnetometers data, you need to fill the
-%                           missing data with zeros and then using
-%                           S.sensortype correctly to use only the channels
-%                           that you want.
-%           -S.sensortype:  3 for both
-%                           1 for gradiometers
-%                           2 for magnetometers
-%                           If empty [], default is 3.
-%           -S.MEGlayout:   approximation of MEG layout (magnetometers) (double)
-%           -S.permut:      number of permutations for Monte Carlo simulation
-%           -S.clustmax:    set 1 for only max cluster size of each permutation MCS (more strict).
-%                           set 0 for every size of each cluster detected for each permutation MCS (less strict).
-%           -S.permthresh:  threshold for considering significant the size of the original clusters
-%                           (expressed between 0 and 1; e.g. 5% = 0.05)
+%  INPUT:   -S.data:          actual data (binarized p-values) (double).
+%                             Sensorhor x sensorvert x time x channeltype.
+%                             The 4th dimension must contain:
+%                             -1st: gradiometers (GRAD_data in the output of MEG_sensors_MCS_reshapingdata_LBPD_D.m)
+%                             -2nd: magnetometers positive (MAG_data_pos in the output of MEG_sensors_MCS_reshapingdata_LBPD_D.m)
+%                             -3th: magnetometers negative (MAG_data_neg in the output of MEG_sensors_MCS_reshapingdata_LBPD_D.m)
+%                             If you want to submit only gradiometers or
+%                             magnetometers data, you need to fill the
+%                             missing data with zeros and then using
+%                             S.sensortype correctly to use only the channels
+%                             that you want.
+%           -S.sensortype:    3 for both
+%                             1 for gradiometers
+%                             2 for magnetometers
+%                             If empty [], default is 3.
+%           -S.MEGlayout:     approximation of MEG layout (magnetometers) (double)
+%           -S.permut:        number of permutations for Monte Carlo simulation
+%           -S.clustmax:      set 1 for only max cluster size of each permutation MCS (more strict).
+%                             set 0 for every size of each cluster detected for each permutation MCS (less strict).
+%           -S.permthresh:    threshold for considering significant the size of the original clusters
+%                             (expressed between 0 and 1; e.g. 5% = 0.05)
+%           -S.MAG_GRAD_tval: matrix with t-values: channels x channels x time-points x sensor-type (mag (1), grad(2)).
+%                             Do not provide the field if you do not want to use t-values.
+%           -S.time:          vector with time in seconds.
+%                             Do not provide the field if you want the time in time-samples. 
 
-%  OUTPUT:  -MAG_clust_pos: clusters for positive magnetometers data
-%           -MAG_clust_neg: clusters for negative magnetometers data
-%           -GRAD_clust:    clusters for gradiometers data
+%  OUTPUT:  -MAG_clust_pos:   clusters for positive magnetometers data
+%           -MAG_clust_neg:   clusters for negative magnetometers data
+%           -GRAD_clust:      clusters for gradiometers data
 
 
 
@@ -151,7 +155,12 @@ for dd = dummm %over gradiometers and magnetometers
             cc = find(k_info_t(d(kk),2) > dummysort); %getting a specific p-value by.. finding how many times original significant cluster was larger than permuted ones
             cc2(kk) = (length(dummysort) - length(cc))/length(dummysort); %then getting false positive (amount of simulated clusters - times when original significant cluster was larger than permuted ones) and dividing them by amount of simulated clusters
         end
-        PP = cell(length(d),4);
+        if isfield(S,'MAG_GRAD_tval')
+            PP = cell(length(d),5);
+            MAG_GRAD_tval = S.MAG_GRAD_tval;
+        else
+            PP = cell(length(d),4);
+        end
         for hh = 1:length(d)
             PP(hh,1) = {hh}; %new ID of the clusters
             PP(hh,2) = {k_info_t(d(hh),2)}; %sizes
@@ -159,7 +168,15 @@ for dd = dummm %over gradiometers and magnetometers
             dj = cell(length(Idx2t{d(hh)}),2); %this is for getting a better output.. so having the number of channels and then the significant time-points
             dj2 = cell(length(Idx2t{d(hh)}),1); %here proper names are stored
             countdj = 0;
-            for kkk = 1:length(Idx2t{d(hh)})
+            %getting maximum t-value (or minimum for negative t-values)
+            if dd == 1 %gradiometers
+                PP(hh,5) = {max(max(max(MAG_GRAD_tval(:,:,Idx3t{d(hh)},2))))}; %here it is confusing but correct that in MAG_GRAD_tval gradiometers are indexed by the index '2'
+            elseif dd == 2 %magnetometers (positive)
+                PP(hh,5) = {max(max(max(MAG_GRAD_tval(:,:,Idx3t{d(hh)},1))))};
+            elseif dd == 3 %magnetometers (negative)
+                PP(hh,5) = {min(min(min(MAG_GRAD_tval(:,:,Idx3t{d(hh)},1))))};
+            end
+            for kkk = 1:length(Idx2t{d(hh)}) %over MEG channels forming the significant cluster
                 fxd = find(S.MEGlayout(Idx1t{d(hh)}(kkk),Idx2t{d(hh)}(kkk)) == cell2mat(dj(:,1))); %looking if the channel has already been stored
                 if isempty(fxd) %if not store it
                     countdj = countdj + 1;
@@ -178,10 +195,21 @@ for dd = dummm %over gradiometers and magnetometers
                             dj2(countdj,1) = {['MEG' num2str(S.MEGlayout(Idx1t{d(hh)}(kkk),Idx2t{d(hh)}(kkk)))]};
                         end
                     end
-                    %leonardo Aarhus 23/08/2019
-                    dj(countdj,2) = {Idx3t{d(hh)}(kkk)}; %store the first significant time-point of the channel
+                    %leonardo Bologna 05/01/2023
+                    if isfield(S,'time')
+                        dj(countdj,2) = {S.time(Idx3t{d(hh)}(kkk))}; %store the first significant time-point of the channel
+                    else
+                        %leonardo Aarhus 23/08/2019
+                        dj(countdj,2) = {Idx3t{d(hh)}(kkk)}; %store the first significant time-point of the channel
+                    end
                 else %if it is already there, then use its index fxd
-                    dj(fxd,2) = {cat(1,dj{fxd,2},Idx3t{d(hh)}(kkk))}; %and store the other significant time-points                    
+                    %leonardo Bologna 05/01/2023
+                    if isfield(S,'time')
+                        dj(fxd,2) = {cat(1,dj{fxd,2},S.time(Idx3t{d(hh)}(kkk)))}; %and store the other significant time-points
+                    else
+                        %leonardo Aarhus 23/08/2019
+                        dj(fxd,2) = {cat(1,dj{fxd,2},Idx3t{d(hh)}(kkk))}; %and store the other significant time-points
+                    end
                 end
             end
 %             lsd = dj(:,1); %storing original channels IDs.. (temporary variable.. just because I like to have proper MEG channel names in the 1st column and the original IDs in the 3th one..)
