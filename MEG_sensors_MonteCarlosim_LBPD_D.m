@@ -51,7 +51,10 @@ function [ MAG_clust_pos, MAG_clust_neg, GRAD_clust ] = MEG_sensors_MonteCarlosi
 %           -S.MAG_GRAD_tval: matrix with t-values: channels x channels x time-points x sensor-type (mag (1), grad(2)).
 %                             Do not provide the field if you do not want to use t-values.
 %           -S.time:          vector with time in seconds.
-%                             Do not provide the field if you want the time in time-samples. 
+%                             Do not provide the field if you want the time in time-samples.
+%           -S.clust_sort:    1 for sorting the clusters according to their size.
+%                             2 for doing that according to the strongest (in absolute terms) t-value.
+%                             Do not provide the field if you do not want to sort the clusters (non-suggested..).
 
 %  OUTPUT:  -MAG_clust_pos:   clusters for positive magnetometers data
 %           -MAG_clust_neg:   clusters for negative magnetometers data
@@ -212,18 +215,27 @@ for dd = dummm %over gradiometers and magnetometers
                     end
                 end
             end
-%             lsd = dj(:,1); %storing original channels IDs.. (temporary variable.. just because I like to have proper MEG channel names in the 1st column and the original IDs in the 3th one..)
+            %             lsd = dj(:,1); %storing original channels IDs.. (temporary variable.. just because I like to have proper MEG channel names in the 1st column and the original IDs in the 3th one..)
             dj(:,1) = dj2; %overwriting proper MEG channel names over IDs.. (1st column)
-%             dj(:,3) = lsd; %storing in output file the original channel IDs (3th column)
+            %             dj(:,3) = lsd; %storing in output file the original channel IDs (3th column)
             djnew = dj(~any(cellfun('isempty',dj),2),:); %remove the possible (and very likely to exist) empty cell
-%             for lkl = 1:size(djnew,1) %providing a 4-digit format to the original IDs.. it is going to be useful later..
-%                 if length(num2str(djnew{lkl,3})) == 3 %if it is a 3-figure number
-%                     djnew(lkl,3) = {['0' num2str(djnew{lkl,3})]}; %apply an additional 0
-%                 else
-%                     djnew(lkl,3) = {num2str(djnew{lkl,3})}; %otherwise simply convert the number into character..
-%                 end
-%             end
+            %             for lkl = 1:size(djnew,1) %providing a 4-digit format to the original IDs.. it is going to be useful later..
+            %                 if length(num2str(djnew{lkl,3})) == 3 %if it is a 3-figure number
+            %                     djnew(lkl,3) = {['0' num2str(djnew{lkl,3})]}; %apply an additional 0
+            %                 else
+            %                     djnew(lkl,3) = {num2str(djnew{lkl,3})}; %otherwise simply convert the number into character..
+            %                 end
+            %             end
             PP(hh,3) = {(djnew(:,:))}; %storing channels and corresponding time-points for output structure
+        end
+        %sorting order of clusters according to their size or maximum t-value (in absolute terms)
+        if isfield(S,'clust_sort')
+            if S.clust_sort == 1 %cluster size
+                [~,iors] = sort(cell2mat(PP(:,2)));
+            elseif S.clust_sort == 2 %cluster maximum t-value (in absolute terms)
+                [~,iors] = sort(abs(cell2mat(PP(:,5))));
+            end
+            PP(:,2:5) = PP(iors(end:-1:1),2:5);
         end
     else
         PP = {[]};
@@ -237,7 +249,6 @@ for dd = dummm %over gradiometers and magnetometers
         MAG_clust_neg = PP;
     end  
 end
-
 
 end
 
