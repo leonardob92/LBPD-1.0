@@ -248,7 +248,7 @@ for dd = dummm %over gradiometers and magnetometers
             elseif S.clust_sort == 2 %cluster maximum t-value (in absolute terms)
                 [~,iors] = sort(abs(cell2mat(PP(:,5))));
             end
-            PP(:,2:5) = PP(iors(end:-1:1),2:5);
+            PP(:,2:end) = PP(iors(end:-1:1),2:end);
         end
         PP2(2:end,:) = PP;
     else
