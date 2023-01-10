@@ -59,6 +59,14 @@ function [ MAG_clust_pos, MAG_clust_neg, GRAD_clust ] = MEG_sensors_MonteCarlosi
 %  OUTPUT:  -MAG_clust_pos:   clusters for positive magnetometers data
 %           -MAG_clust_neg:   clusters for negative magnetometers data
 %           -GRAD_clust:      clusters for gradiometers data
+%                             The columns of the above mentioned matrices are organized as follows:
+%                             1) # cluster
+%                             2) cluster size
+%                             3) Detailed information about MEG channels and time-points
+%                             4) p-value (0 means < than minimum threshold (S.permthresh))
+%                             5) maximum t-value (in absolute terms)
+%                             6) beginning of the significant cluster (first time-point) 
+%                             7) end of the significant cluster (last time-point)
 
 
 
@@ -158,13 +166,13 @@ for dd = dummm %over gradiometers and magnetometers
             cc = find(k_info_t(d(kk),2) > dummysort); %getting a specific p-value by.. finding how many times original significant cluster was larger than permuted ones
             cc2(kk) = (length(dummysort) - length(cc))/length(dummysort); %then getting false positive (amount of simulated clusters - times when original significant cluster was larger than permuted ones) and dividing them by amount of simulated clusters
         end
-        if isfield(S,'MAG_GRAD_tval')
-            PP = cell(length(d),5);
+        PP = cell(length(d),7);
+        if isfield(S,'MAG_GRAD_tval') %if you want the t-values reported in the output structure
             MAG_GRAD_tval = S.MAG_GRAD_tval;
-        else
-            PP = cell(length(d),4);
         end
-        for hh = 1:length(d)
+        PP2 = cell(length(d)+1,7);
+        PP2(1,1) = {'Cluster #'}; PP2(1,2) = {'Size'}; PP2(1,3) = {'Details'}; PP2(1,4) = {'MCS p-val'}; PP2(1,5) = {'Max T-val'}; PP2(1,6) = {'Time (1)'}; PP2(1,7) = {'Time (end)'};
+        for hh = 1:length(d) %over significant clusters
             PP(hh,1) = {hh}; %new ID of the clusters
             PP(hh,2) = {k_info_t(d(hh),2)}; %sizes
             PP(hh,4) = {cc2(hh,1)}; %p-values of each cluster
@@ -179,6 +187,7 @@ for dd = dummm %over gradiometers and magnetometers
             elseif dd == 3 %magnetometers (negative)
                 PP(hh,5) = {min(min(min(MAG_GRAD_tval(:,:,Idx3t{d(hh)},1))))};
             end
+            DJ = []; %initializing it for storing minimum and maximum time-points for the significant cluster hh
             for kkk = 1:length(Idx2t{d(hh)}) %over MEG channels forming the significant cluster
                 fxd = find(S.MEGlayout(Idx1t{d(hh)}(kkk),Idx2t{d(hh)}(kkk)) == cell2mat(dj(:,1))); %looking if the channel has already been stored
                 if isempty(fxd) %if not store it
@@ -214,11 +223,15 @@ for dd = dummm %over gradiometers and magnetometers
                         dj(fxd,2) = {cat(1,dj{fxd,2},Idx3t{d(hh)}(kkk))}; %and store the other significant time-points
                     end
                 end
+                DJ = cat(1,DJ,dj{countdj,2});
             end
+            %extracting minimum and maximum time-points for cluster hh
+            PP(hh,6) = {min(DJ)}; %storing output
+            PP(hh,7) = {max(DJ)}; %storing output
             %             lsd = dj(:,1); %storing original channels IDs.. (temporary variable.. just because I like to have proper MEG channel names in the 1st column and the original IDs in the 3th one..)
             dj(:,1) = dj2; %overwriting proper MEG channel names over IDs.. (1st column)
             %             dj(:,3) = lsd; %storing in output file the original channel IDs (3th column)
-            djnew = dj(~any(cellfun('isempty',dj),2),:); %remove the possible (and very likely to exist) empty cell
+            djnew = dj(~any(cellfun('isempty',dj),2),:); %remove the possible (and very likely to exist) empty cell; this happens because one channel can have more than only one time-point which is significant.. this is actually what always happens and it would be very suspicious if it did not..
             %             for lkl = 1:size(djnew,1) %providing a 4-digit format to the original IDs.. it is going to be useful later..
             %                 if length(num2str(djnew{lkl,3})) == 3 %if it is a 3-figure number
             %                     djnew(lkl,3) = {['0' num2str(djnew{lkl,3})]}; %apply an additional 0
@@ -237,16 +250,17 @@ for dd = dummm %over gradiometers and magnetometers
             end
             PP(:,2:5) = PP(iors(end:-1:1),2:5);
         end
+        PP2(2:end,:) = PP;
     else
-        PP = {[]};
+        PP2 = {[]};
     end
     %storing clusters in the proper channel type (and polarity) specification
     if dd == 1
-        GRAD_clust = PP;
+        GRAD_clust = PP2;
     elseif dd == 2
-        MAG_clust_pos = PP;
+        MAG_clust_pos = PP2;
     else
-        MAG_clust_neg = PP;
+        MAG_clust_neg = PP2;
     end  
 end
 
