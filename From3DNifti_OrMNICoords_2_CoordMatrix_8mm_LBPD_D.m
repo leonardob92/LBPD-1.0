@@ -8,7 +8,7 @@ function idx = From3DNifti_OrMNICoords_2_CoordMatrix_8mm_LBPD_D( S )
 
 % INPUT:    -S.input:       1 = MNI coordinates, e.g. [-45 -32 6];
 %                           2 = AAL ROIs e.g. [45 50 89];
-%                           3 = general image with non-zero values (provided as a nifiti image)
+%                           3 = general image with non-zero values (provided as a nifti image)
 %           -S.coordd:      MNI coordinates x y z, e.g. [-45 -32 6]
 %           -S.AAL_ROIs:    AAL ROIs numbers you want to use, e.g. [45 50 89];
 %           -S.image:       path to nifti image with non-zero values
@@ -104,6 +104,7 @@ elseif S.input == 3 %case with general image
     idx = zeros(length(dum),2);
     idx(:,1) = maskt(dum); %proper indices
     idx(:,2) = imgdum(dum); %associated values (it may be useful to have them as well)
+    idx(idx(:,1)==0,:) = []; %deleting 0s from indices.. this may happen for different approximations in the images but it does not represent a concern
 end
 
 end

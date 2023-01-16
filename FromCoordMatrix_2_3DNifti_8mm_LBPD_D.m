@@ -85,6 +85,31 @@ if isfield(S,'singleimage')
         end
     end
 end
+if ~isfield(S,'singleimage') %this is done for historical reasons of how thid funciton has been developed.. in this way it will still work for previous scripts, although it does not look very elegant..
+    for iii = 1:size(data,2) %over time-points (or ROIs, etc.)
+        if isfield(S,'names')
+            fnamenii = [S.fname '/' S.names{iii} '.nii.gz']; %path and name of the image to be saved
+        else
+            fnamenii = [S.fname '/Image_' num2str(iii) '.nii.gz']; %path and name of the image to be saved
+        end
+        SO = data(:,iii);
+        if ~isempty(SO)
+            %building nifti image
+            SS = size(maskk.img);
+            dumimg = zeros(SS(1),SS(2),SS(3),1); %no time here so size of 4D = 1
+            for ii = 1:size(SO,1) %over brain sources
+                dum = find(maskk.img == ii); %finding index of sources ii in mask image (MNI152_8mm_brain_diy.nii.gz)
+                [i1,i2,i3] = ind2sub([SS(1),SS(2),SS(3)],dum); %getting subscript in 3D from index
+                dumimg(i1,i2,i3,:) = SO(ii,:); %storing values
+            end
+            nii = make_nii(dumimg,[8 8 8]); %making nifti image from 3D data matrix (and specifying the 8 mm of resolution)
+            nii.img = dumimg; %storing matrix within image structure
+            nii.hdr.hist = maskk.hdr.hist; %copying some information from maskk
+            disp(['saving nifti image - condition ' num2str(iii)])
+            save_nii(nii,fnamenii); %printing image
+        end
+    end
+end
 
 end
 
