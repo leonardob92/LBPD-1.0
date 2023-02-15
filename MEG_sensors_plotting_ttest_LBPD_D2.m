@@ -63,11 +63,11 @@ function [ OUT ] = MEG_sensors_plotting_ttest_LBPD_D2( S )
 %                                        This is useful especially for plotting the proper labels..
 %   -S.condnumb:                         meaningful only if you do not extract the data from SPM objects.
 %                                        Vector with the indices of the conditions that you want to waveform plot.
-%                                        These indices must be consistent with the order of the conditions 
+%                                        These indices must be consistent with the order of the conditions
 %                                        of the S.data that you provide!
-%                                        They must also be consistent with S.condwaveform (the labels of the 
+%                                        They must also be consistent with S.condwaveform (the labels of the
 %                                        conditions that you also provide for waveform plotting).
-%   -S.save_data:                        1 for saving the data     
+%   -S.save_data:                        1 for saving the data
 %   -S.save_name_data:                   name for data file to be saved (character).
 %                                        This is used also to load t-tests and plot the difference topoplot.
 
@@ -77,6 +77,8 @@ function [ OUT ] = MEG_sensors_plotting_ttest_LBPD_D2( S )
 %   -S.ave_cond:                         cell array with vectors of indices of conditions to be averaged and then plotted.
 %                                        e.g. {[1,3],[2,4,5],[6]} to average 1 and 3, and then 2, 4 and 5, and then only 6 and plot them again each other
 %                                        Leave it empty {[]} if you want to average all conditions together
+%   -S.new_cond_lab:                     name for new averaged (or selected) conditions ({'old','New1','New2'}).
+%                                        leave it empty [] or do not specify it if you do not want it. 
 %   -S.mag_lab:                          1 for magnetometers
 %                                        2 for gradiometers
 %   -S.x_lim_temp_wave:                  limits for time (in secs)
@@ -93,7 +95,7 @@ function [ OUT ] = MEG_sensors_plotting_ttest_LBPD_D2( S )
 %                                        across specific channels
 %   -S.left_mag:                         channels to be plotted together
 %                                        (indeces from original channel labels).
-%                                        The name 'left_mag' is confusing 
+%                                        The name 'left_mag' is confusing
 %                                        and due to historical reasons of
 %                                        this function.
 %   -S.avewave_contrast:                 1 to plot the contrast between
@@ -133,7 +135,7 @@ function [ OUT ] = MEG_sensors_plotting_ttest_LBPD_D2( S )
 %   -S.topocondsing:                     empty [] for mean across conditions.
 %                                        E.g. [1] for plotting only
 %                                        S.conditions{1}.
-%                                        Meaningful only if S.topocontr = 0. 
+%                                        Meaningful only if S.topocontr = 0.
 %   -S.xlim:                             set limit time for topoplot (in seconds)
 %                                        E.g. [0.95 1.05]
 %   -S.zlimmag:                          set limit amplitude for topoplot (magnetometers)
@@ -207,7 +209,7 @@ if isfield(S,'data') %it requires that S.data exists
             idxfk = find(strcmp(chans,'MEG0112+0113')); %same for grad
             magI = idxMEGc1:2:idxMEGc1+202; %mag indices (OBS!!! assuming that the order is always: mag - grad - mag - grad.. or the other way around (grad - mag - grad..) but not mag - mag - mag or grad - grad - grad..
             gradI = idxfk:2:idxfk+202; %same concept for grad..
-            %             idxMEGc2 = find(strcmp(chans,'MEG2642+2643')); %original          
+            %             idxMEGc2 = find(strcmp(chans,'MEG2642+2643')); %original
             if isempty(idxMEGc1) || isempty(idxfk)
                 error('the label of the MEG channels do not correspond to the standard ones used in this function.. you need to change either the labels of the function or the ones of your data.. check for spaces between MEG and 0111.. sometimes that is the problem..')
             end
@@ -221,7 +223,7 @@ if isfield(S,'data') %it requires that S.data exists
                     %leonardo 16/05/2020
                     data_mat(1:2:203,:,jj,hh) = D(magI,tex,conds(hh)); %always "mag - grad - mag - grad - mag - grad.." (mag first)
                     data_mat(2:2:204,:,jj,hh) = D(gradI,tex,conds(hh)); %then grad
-%                     data_mat(:,:,jj,hh) = D(idxMEGc1:idxMEGc2,tex,conds(hh)); %original
+                    %                     data_mat(:,:,jj,hh) = D(idxMEGc1:idxMEGc2,tex,conds(hh)); %original
                 end
             end
             disp(['subject ' num2str(jj) ' computed'])
@@ -296,7 +298,7 @@ if ~isfield(S,'condwaveform')
     S.condwaveform = S.conditions;
 end
 
-%if you have more then 8 the plot would anyway be not really understandle, so I did not really care here.. of course this could be easily improved if someone feels like it is actually useful..    
+%if you have more then 8 the plot would anyway be not really understandle, so I did not really care here.. of course this could be easily improved if someone feels like it is actually useful..
 if S.waveform_singlechannels_label == 1
     %getting a few inputs
     kkk = S.mag_lab - 1;
@@ -327,7 +329,7 @@ if S.waveform_singlechannels_label == 1
                     subplot(3,3,iik);
                     if S.wave_plot_conditions_together == 1
                         %original color_line
-%                         h1 = plot(time_sel,data_mean((countwave + kkk),:,aa),color_line{aa},'LineWidth',2,'DisplayName',plotlab); %average waveform
+                        %                         h1 = plot(time_sel,data_mean((countwave + kkk),:,aa),color_line{aa},'LineWidth',2,'DisplayName',plotlab); %average waveform
                         %until here
                         h1 = plot(time_sel,data_mean((countwave + kkk),:,aa),'Color',color_line(aa,:),'LineWidth',2,'DisplayName',plotlab); %average waveform
                     else
@@ -356,9 +358,9 @@ if S.waveform_singlechannels_label == 1
                     else
                         legcell(1,aa) = {S.condwaveform{aa}}; %same..
                     end
-%                     grid on
+                    %                     grid on
                     grid minor
-                end                   
+                end
                 legend([legendv],legcell) %same..
                 legend('show');
                 title(chanlabels(countwave + kkk));
@@ -370,8 +372,8 @@ if S.waveform_singlechannels_label == 1
     end
     clear legendv
 end
-        
-        
+
+
 %computing t-tests..
 if S.t_test_for_permutations == 1
     disp('computing t-tests..')
@@ -415,7 +417,7 @@ if S.t_test_for_permutations == 1
                 ab = find(isnan(b));
                 abd = [ab ad];
                 a(abd) = [];
-                b(abd) = [];                
+                b(abd) = [];
                 [~,pttest,~,tstats] = ttest(a,b);
                 deftstat(jsk,jsl) = tstats.tstat;
                 deftstatp(jsk,jsl) = pttest;
@@ -459,10 +461,10 @@ if S.t_test_for_permutations == 1
     OUT.chanlabels = chanlabels;
     OUT.time_sel = time_sel;
     disp('saving statistics..') %this is always done automatically
-    if length(S.cond_ttests_tobeplotted_topoplot) == 2 %if you want to compare two conditions        
+    if length(S.cond_ttests_tobeplotted_topoplot) == 2 %if you want to compare two conditions
         save([S.outdir '/' S.save_name_data '_OUT_' S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} '_vs_' S.conditions{S.cond_ttests_tobeplotted_topoplot(2)} '.mat'],'OUT')
     else %if you want to compare one condition with its own baseline
-        save([S.outdir '/' S.save_name_data '_OUT_' S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} '_vs_baseline.mat'],'OUT')        
+        save([S.outdir '/' S.save_name_data '_OUT_' S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} '_vs_baseline.mat'],'OUT')
     end
 else
     OUT.TSTAT_mag = [];
@@ -483,22 +485,22 @@ if S.waveform_average_label == 1
     
     %originally I wrote codes for plotting one picture per hemisphere since
     %due to the often-happpening symmetry of brain activity that sounded
-    %like a good idea. However, I think it is now more reasonable to provide only one plotting option and run it again as many times as needed by user 
-%     right_mag = S.right_mag;
-%     if S.mag_lab == 2
-%         left_mag = left_mag + 1;
-% %         right_mag = right_mag + 1;
-%     elseif S.mag_lab ~= 1
-%         warning('are you sure you know what you want to plot..? magnetometers or gradiometers or what..?')
-%     end
-    %preparing left and right hemisphere data    
+    %like a good idea. However, I think it is now more reasonable to provide only one plotting option and run it again as many times as needed by user
+    %     right_mag = S.right_mag;
+    %     if S.mag_lab == 2
+    %         left_mag = left_mag + 1;
+    % %         right_mag = right_mag + 1;
+    %     elseif S.mag_lab ~= 1
+    %         warning('are you sure you know what you want to plot..? magnetometers or gradiometers or what..?')
+    %     end
+    %preparing left and right hemisphere data
     Sz = size(data_mat);
     mat_left_mag = zeros(length(left_mag),Sz(2),Sz(3),length(conds));
-%     mat_right_mag = zeros(length(right_mag),Sz(2),Sz(3),length(conds));
+    %     mat_right_mag = zeros(length(right_mag),Sz(2),Sz(3),length(conds));
     for count_lx = 1:length(left_mag) %count for both left and right
         for gg = 1:length(conds)
             mat_left_mag(count_lx,:,:,gg) = data_mat(left_mag(count_lx),:,:,gg);
-%             mat_right_mag(count_lx,:,:,gg) = data_mat(right_mag(count_lx),:,:,gg);
+            %             mat_right_mag(count_lx,:,:,gg) = data_mat(right_mag(count_lx),:,:,gg);
         end
     end
     %mean
@@ -511,10 +513,10 @@ if S.waveform_average_label == 1
     end
     
     %mean_left_mag = squeeze(nanmean(squeeze(nanmean(mat_left_mag,1)),2));
-%     mean_right_mag = squeeze(mean(squeeze(mean(mat_right_mag,1)),2));
+    %     mean_right_mag = squeeze(mean(squeeze(mean(mat_right_mag,1)),2));
     %standard error
     %stde_left_mag = squeeze(std(squeeze(nanmean(mat_left_mag,1)),0,2,'omitnan')/sqrt(Sz(3)));
-%     stde_right_mag = squeeze(std(squeeze(mean(mat_right_mag,1)),0,2)/sqrt(Sz(3)));
+    %     stde_right_mag = squeeze(std(squeeze(mean(mat_right_mag,1)),0,2)/sqrt(Sz(3)));
     %if you want to plot the average over conditions
     if S.wave_plot_conditions_together == 1
         if ~isempty(S.ave_cond)
@@ -532,29 +534,38 @@ if S.waveform_average_label == 1
             %         mean_right_mag = mean(mean_right_mag,2);
             stde_left_mag = nanmean(stde_left_mag,2);
         end
-%         stde_right_mag = mean(stde_right_mag,2);
-        plotlab = 'avg conditions';
-        cond_n = 1; %and therefore the number of conditions becomes one
+        %         stde_right_mag = mean(stde_right_mag,2);
+        if isfield(S,'new_cond_lab')
+            if ~isempty(S.new_cond_lab)
+                cond_n = length(S.new_cond_lab);
+            else
+                S.new_cond_lab{1} = 'avg conditions';
+                cond_n = 1; %and therefore the number of conditions becomes one
+            end
+        else
+            S.new_cond_lab{1} = 'avg conditions';
+            cond_n = 1; %and therefore the number of conditions becomes one
+        end
     else
         cond_n = length(conds);
     end
     %actual plotting
     legcell = cell(1,cond_n);
-%     clf(figure(13))
-%     figure(13)
+    %     clf(figure(13))
+    %     figure(13)
     figure
     thc = ones(cond_n)*2.5;
-%     %%% hard coding.. just for one specific purpose.. not for more general
-%     %%% ones..
-%     color_line = {'b','r','b','r'};
-%     color_line = {'r','b','r','b'};
-%     thc = [3,3,2,2];
-%     %%%
-%     thc = [2,2,1,1]; %this is for changing the thickness of the waveforms.. if it is needed..
-
+    %     %%% hard coding.. just for one specific purpose.. not for more general
+    %     %%% ones..
+    %     color_line = {'b','r','b','r'};
+    %     color_line = {'r','b','r','b'};
+    %     thc = [3,3,2,2];
+    %     %%%
+    %     thc = [2,2,1,1]; %this is for changing the thickness of the waveforms.. if it is needed..
+    
     for aa = 1:cond_n
         if S.wave_plot_conditions_together == 1
-            h1 = plot(time_sel,mean_left_mag(:,aa),'Color',color_line(aa,:),'LineWidth',thc(aa),'DisplayName',plotlab); %average waveform            
+            h1 = plot(time_sel,mean_left_mag(:,aa),'Color',color_line(aa,:),'LineWidth',thc(aa),'DisplayName',S.new_cond_lab{aa}); %average waveform
         else
             h1 = plot(time_sel,mean_left_mag(:,aa),'Color',color_line(aa,:),'LineWidth',thc(aa),'DisplayName',S.condwaveform{aa}); %average waveform
         end
@@ -577,19 +588,19 @@ if S.waveform_average_label == 1
         hold on
         legendv(1,aa) = h1; %this is for working around the problem of the multiple legends for stde that we do not want..
         if S.wave_plot_conditions_together == 1
-            legcell(1,aa) = {plotlab};
+            legcell(1,aa) = {S.new_cond_lab{aa}};
         else
             legcell(1,aa) = {S.condwaveform{aa}}; %same..
         end
     end
-%     grid on
-%     grid minor
+    %     grid on
+    %     grid minor
     if ~isempty(S.signtp{1})
         %plotting the significant time-points with gray shades
         patch_color = [.85 .85 .85]; % Color of grey box marking time-ranges
         ylims = get(gca,'YLim');
         for ii = 1:length(S.signtp)
-%             sgf2 = S.signtp{ii}./S.sr;
+            %             sgf2 = S.signtp{ii}./S.sr;
             sgf2 = S.signtp{ii};
             patch([sgf2(1) sgf2(end) sgf2(end) sgf2(1)],[ylims(1) ylims(1) ylims(2) ylims(2)],patch_color,'EdgeColor','none','FaceAlpha',.4)
             hold on
@@ -636,45 +647,45 @@ if S.waveform_average_label == 1
         legend([legendv],legcell) %same..
         legend('show');
     end
-%     title('left averaged channels');
+    %     title('left averaged channels');
     %right MEG channels
-%     legcell = cell(1,cond_n);
-%     clf(figure(14))
-%     figure(14)
-%     for aa = 1:cond_n     
-%         if S.wave_plot_conditions_together == 1
-%             h1 = plot(time_sel,mean_right_mag(:,aa),color_line{aa},'LineWidth',2,'DisplayName',plotlab); %average waveform            
-%         else
-%             h1 = plot(time_sel,mean_right_mag(:,aa),color_line{aa},'LineWidth',2,'DisplayName',S.conditions{aa}); %average waveform
-%         end  
-%         xlim(x_lim_temp);
-%         if ~isempty(y_lim_ampl)
-%             ylim(y_lim_ampl);
-%         end
-%         hold on
-%         plot(time_sel,mean_right_mag(:,aa) + stde_right_mag(:,aa),[':' color_line{aa}],'LineWidth',0.5); %upper std error
-%         xlim(x_lim_temp);
-%         if ~isempty(y_lim_ampl)
-%             ylim(y_lim_ampl);
-%         end
-%         hold on
-%         plot(time_sel,mean_right_mag(:,aa) - stde_right_mag(:,aa),[':' color_line{aa}],'LineWidth',0.5); %lower std error
-%         xlim(x_lim_temp);
-%         if ~isempty(y_lim_ampl)
-%             ylim(y_lim_ampl);
-%         end
-%         hold on
-%         legendv(1,aa) = h1; %this is for working around the problem of the multiple legends for stde that we do not want..
-%         if S.wave_plot_conditions_together == 1
-%             legcell(1,aa) = {plotlab};
-%         else
-%             legcell(1,aa) = {S.conditions{aa}}; %same..
-%         end
-%         grid on
-%     end                   
-%     legend([legendv],legcell) %same..
-%     legend('show');
-%     title('right averaged channels');
+    %     legcell = cell(1,cond_n);
+    %     clf(figure(14))
+    %     figure(14)
+    %     for aa = 1:cond_n
+    %         if S.wave_plot_conditions_together == 1
+    %             h1 = plot(time_sel,mean_right_mag(:,aa),color_line{aa},'LineWidth',2,'DisplayName',plotlab); %average waveform
+    %         else
+    %             h1 = plot(time_sel,mean_right_mag(:,aa),color_line{aa},'LineWidth',2,'DisplayName',S.conditions{aa}); %average waveform
+    %         end
+    %         xlim(x_lim_temp);
+    %         if ~isempty(y_lim_ampl)
+    %             ylim(y_lim_ampl);
+    %         end
+    %         hold on
+    %         plot(time_sel,mean_right_mag(:,aa) + stde_right_mag(:,aa),[':' color_line{aa}],'LineWidth',0.5); %upper std error
+    %         xlim(x_lim_temp);
+    %         if ~isempty(y_lim_ampl)
+    %             ylim(y_lim_ampl);
+    %         end
+    %         hold on
+    %         plot(time_sel,mean_right_mag(:,aa) - stde_right_mag(:,aa),[':' color_line{aa}],'LineWidth',0.5); %lower std error
+    %         xlim(x_lim_temp);
+    %         if ~isempty(y_lim_ampl)
+    %             ylim(y_lim_ampl);
+    %         end
+    %         hold on
+    %         legendv(1,aa) = h1; %this is for working around the problem of the multiple legends for stde that we do not want..
+    %         if S.wave_plot_conditions_together == 1
+    %             legcell(1,aa) = {plotlab};
+    %         else
+    %             legcell(1,aa) = {S.conditions{aa}}; %same..
+    %         end
+    %         grid on
+    %     end
+    %     legend([legendv],legcell) %same..
+    %     legend('show');
+    %     title('right averaged channels');
     if S.avewave_contrast == 1 %checking if the contrasts have been previously calculated
         if S.wave_plot_conditions_together == 0 %if you do not want conditions averaged together, it is assumed that you may want not only cond1 and cond2 independently but also their contrast
             if isempty(OUT.TSTAT_mag) %loading contrasts if they are not in the workspace (very likely)
@@ -690,15 +701,15 @@ if S.waveform_average_label == 1
                 %extracting requested channels
                 if mod(left_mag(1),2) == 1 %if indices are odd we have magnetometers
                     datdiff_l = TSTAT_mag(floor(left_mag/2 + 1),:);
-%                     datdiff_r = TSTAT_mag(floor(right_mag/2 + 1),:);
+                    %                     datdiff_r = TSTAT_mag(floor(right_mag/2 + 1),:);
                 else %otherwise we have gradiometers
                     datdiff_l = TSTAT_grad(left_mag/2,:);
-%                     datdiff_r = TSTAT_grad(right_mag/2);
+                    %                     datdiff_r = TSTAT_grad(right_mag/2);
                 end
                 %mean of t-values
                 mddl = squeeze(nanmean(datdiff_l,1));
                 mddl(isnan(mddl)) = 0; %here the first column may be NaN because it may have occurred to calculate t-tests with 0s against 0s.. therefore here the NaN values are converted to 0 for plotting purposes
-%                 mddr = squeeze(mean(datdiff_r,1));
+                %                 mddr = squeeze(mean(datdiff_r,1));
                 %actual plotting
                 clf(figure(15))
                 figure(15)
@@ -710,7 +721,7 @@ if S.waveform_average_label == 1
                     patch_color = [.85 .85 .85]; % Color of grey box marking time-ranges
                     ylims = get(gca,'YLim');
                     for ii = 1:length(S.signtp)
-            %             sgf2 = S.signtp{ii}./S.sr;
+                        %             sgf2 = S.signtp{ii}./S.sr;
                         sgf2 = S.signtp{ii};
                         patch([sgf2(1) sgf2(end) sgf2(end) sgf2(1)],[ylims(1) ylims(1) ylims(2) ylims(2)],patch_color,'EdgeColor','none','FaceAlpha',.5)
                         hold on
@@ -719,25 +730,25 @@ if S.waveform_average_label == 1
                 %replotting for better visualization
                 plot(time_sel,mddl,'k','LineWidth',2);
                 xlim([time_sel(1) time_sel(end)])
-                %additional plottin details                
+                %additional plottin details
                 grid on
                 grid minor
                 if S.legc == 1
                     legend('show');
                 end
                 if length(S.cond_ttests_tobeplotted_topoplot) == 2 %if you want to compare two conditions
-                                    
+                    
                     title([S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} ' vs ' S.conditions{S.cond_ttests_tobeplotted_topoplot(2)}])
                 else
                     title([S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} ' vs its own baseline'])
                 end
                 set(gcf,'Color','w')
-%                 clf(figure(16))
-%                 figure(16)
-%                 plot(time_sel,mddr,'k','LineWidth',2,'DisplayName','right hem');
-%                 grid on
-%                 legend('show');
-%                 title([S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} ' vs ' S.conditions{S.cond_ttests_tobeplotted_topoplot(2)}])
+                %                 clf(figure(16))
+                %                 figure(16)
+                %                 plot(time_sel,mddr,'k','LineWidth',2,'DisplayName','right hem');
+                %                 grid on
+                %                 legend('show');
+                %                 title([S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} ' vs ' S.conditions{S.cond_ttests_tobeplotted_topoplot(2)}])
             end
         end
     end
@@ -749,11 +760,11 @@ if S.waveform_average_label == 1
             mgh = 'grad';
         end
         saveas(figure(13),[S.outdir '/wave_' mgh '_' S.label_plot '.jpg' ],'jpg');
-%         saveas(figure(14),[S.outdir '/wave_' mgh '_right_' S.label_plot '.jpg' ],'jpg');
+        %         saveas(figure(14),[S.outdir '/wave_' mgh '_right_' S.label_plot '.jpg' ],'jpg');
         if ~isempty(S.cond_ttests_tobeplotted_topoplot)
             if S.wave_plot_conditions_together == 0
                 saveas(figure(15),[S.outdir '/wave_diff_' mgh '_' S.label_plot '.jpg' ],'jpg');
-%                 saveas(figure(16),[S.outdir '/wave_diff_' mgh '_right_' S.label_plot '.jpg' ],'jpg');
+                %                 saveas(figure(16),[S.outdir '/wave_diff_' mgh '_right_' S.label_plot '.jpg' ],'jpg');
             end
         end
     end
@@ -763,17 +774,17 @@ end
 %topoplot
 if S.topoplot_label == 1
     if S.topocontr == 1 %loading contrasts if you want contrasts (otherwise later it will be calculated a simple mean difference..)
-        if isempty(OUT.TSTAT_mag)     
-           if length(S.cond_ttests_tobeplotted_topoplot) == 2 %if you want to compare two conditions
-               load([S.outdir '/' S.save_name_data '_OUT_' S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} '_vs_' S.conditions{S.cond_ttests_tobeplotted_topoplot(2)} '.mat'],'OUT');
-               disp(['loading contrast ' S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} '_vs_' S.conditions{S.cond_ttests_tobeplotted_topoplot(2)}])
-           else %if you want to compare one condition with its own baseline
-               load([S.outdir '/' S.save_name_data '_OUT_' S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} '_vs_baseline.mat'],'OUT')
-               disp(['loading contrast ' S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} '_vs_ its own baseline'])
-           end
+        if isempty(OUT.TSTAT_mag)
+            if length(S.cond_ttests_tobeplotted_topoplot) == 2 %if you want to compare two conditions
+                load([S.outdir '/' S.save_name_data '_OUT_' S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} '_vs_' S.conditions{S.cond_ttests_tobeplotted_topoplot(2)} '.mat'],'OUT');
+                disp(['loading contrast ' S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} '_vs_' S.conditions{S.cond_ttests_tobeplotted_topoplot(2)}])
+            else %if you want to compare one condition with its own baseline
+                load([S.outdir '/' S.save_name_data '_OUT_' S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} '_vs_baseline.mat'],'OUT')
+                disp(['loading contrast ' S.conditions{S.cond_ttests_tobeplotted_topoplot(1)} '_vs_ its own baseline'])
+            end
             TSTAT_grad = OUT.TSTAT_grad;
             TSTAT_mag = OUT.TSTAT_mag;
-        end     
+        end
     end
     Sz = size(data_mat);
     %loading an example from a previous fieldtrip file obtained after some pre-processing
@@ -814,7 +825,7 @@ if S.topoplot_label == 1
             end
         end
     end
- 
+    
     %actual plotting
     %creating the mask for the data
     cfgdummy = fieldtrip_example.M_timb_lock_gradplanarComb.cfg;
@@ -837,8 +848,8 @@ if S.topoplot_label == 1
         cfg.colormap = S.colormap_spec;
     end
     %clear and open the figure
-%     clf(figure(17));
-%     figure(17);
+    %     clf(figure(17));
+    %     figure(17);
     figure
     ft_topoplotER(cfg,data);
     set(gcf,'Color','w')
@@ -862,8 +873,8 @@ if S.topoplot_label == 1
         cfg.colormap = S.colormap_spec;
     end
     %clear and open the figure
-%     clf(figure(18));
-%     figure(18);
+    %     clf(figure(18));
+    %     figure(18);
     figure
     ft_topoplotER(cfg,data);
     set(gcf,'Color','w')
