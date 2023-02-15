@@ -310,11 +310,30 @@ if S.waveform_singlechannels_label == 1
     end
     data_mean = squeeze(nanmean(data_mat,3)); %averaging data over participants
     data_stde = squeeze(nanstd(data_mat,0,3))/sqrt(Sz(3)); %calcolating standard error
-    if S.wave_plot_conditions_together == 1
-        data_mean = nanmean(data_mean,3); %averaging over conditions
-        data_stde = nanmean(data_stde,3);
-        plotlab = 'avg conditions';
-        cond_n = 1; %and therefore the number of conditions becomes one
+    if S.wave_plot_conditions_together == 1 %if you want to average/select some conditions
+        if ~isempty(S.ave_cond) %if you provide which ones
+            mdum = zeros(size(data_mean,1),size(data_mean,2),length(S.ave_cond)); %preallocating space
+            stddum = zeros(size(data_mean,1),size(data_mean,2),length(S.ave_cond));
+            for qq = 1:length(S.ave_cond) %over conditions to be averaged together
+                mdum(:,:,qq) = nanmean(data_mean(:,:,S.ave_cond{qq}),3); %average over the selected conditions
+                stddum(:,:,qq) = nanmean(data_stde(:,:,S.ave_cond{qq}),3); %std
+            end
+            data_mean = mdum; %assigning averaged data to proper variable
+            data_stde = stddum;
+        end
+        if isfield(S,'new_cond_lab')
+            if ~isempty(S.new_cond_lab)
+                cond_n = length(S.new_cond_lab);
+            else
+                S.new_cond_lab{1} = 'avg conditions';
+                cond_n = 1; %and therefore the number of conditions becomes one
+            end
+        else
+            S.new_cond_lab{1} = 'avg conditions';
+            cond_n = 1; %and therefore the number of conditions becomes one
+        end
+    else
+        cond_n = length(conds);
     end
     countwave = -1;
     for jjk = 1:12
@@ -331,7 +350,7 @@ if S.waveform_singlechannels_label == 1
                         %original color_line
                         %                         h1 = plot(time_sel,data_mean((countwave + kkk),:,aa),color_line{aa},'LineWidth',2,'DisplayName',plotlab); %average waveform
                         %until here
-                        h1 = plot(time_sel,data_mean((countwave + kkk),:,aa),'Color',color_line(aa,:),'LineWidth',2,'DisplayName',plotlab); %average waveform
+                        h1 = plot(time_sel,data_mean((countwave + kkk),:,aa),'Color',color_line(aa,:),'LineWidth',2,'DisplayName',S.new_cond_lab{aa}); %average waveform
                     else
                         h1 = plot(time_sel,data_mean((countwave + kkk),:,aa),'Color',color_line(aa,:),'LineWidth',2,'DisplayName',S.condwaveform{aa}); %average waveform
                     end
@@ -354,7 +373,7 @@ if S.waveform_singlechannels_label == 1
                     hold on
                     legendv(1,aa) = h1; %this is for working around the problem of the multiple legends for stde that we do not want..
                     if S.wave_plot_conditions_together == 1
-                        legcell(1,aa) = {plotlab};
+                        legcell(1,aa) = {S.new_cond_lab{aa}};
                     else
                         legcell(1,aa) = {S.condwaveform{aa}}; %same..
                     end
@@ -610,7 +629,7 @@ if S.waveform_average_label == 1
         %works and takes a very reasonable amount of time to compute..
         for aa = 1:cond_n
             if S.wave_plot_conditions_together == 1
-                h1 = plot(time_sel,mean_left_mag(:,aa),'Color',color_line(aa,:),'LineWidth',thc(aa),'DisplayName',plotlab); %average waveform
+                h1 = plot(time_sel,mean_left_mag(:,aa),'Color',color_line(aa,:),'LineWidth',thc(aa),'DisplayName',S.new_cond_lab{aa}); %average waveform
             else
                 h1 = plot(time_sel,mean_left_mag(:,aa),'Color',color_line(aa,:),'LineWidth',thc(aa),'DisplayName',S.condwaveform{aa}); %average waveform
             end
@@ -633,7 +652,7 @@ if S.waveform_average_label == 1
             hold on
             legendv(1,aa) = h1; %this is for working around the problem of the multiple legends for stde that we do not want..
             if S.wave_plot_conditions_together == 1
-                legcell(1,aa) = {plotlab};
+                legcell(1,aa) = {S.new_cond_lab{aa}};
             else
                 legcell(1,aa) = {S.condwaveform{aa}}; %same..
             end
