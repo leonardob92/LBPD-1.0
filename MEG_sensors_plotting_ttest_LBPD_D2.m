@@ -581,7 +581,7 @@ if S.waveform_average_label == 1
     %     thc = [3,3,2,2];
     %     %%%
     %     thc = [2,2,1,1]; %this is for changing the thickness of the waveforms.. if it is needed..
-    
+%     mean_left_mag = mean_left_mag.*(-1); %if you want to flip the polarity.. it can be useful for plotting purposes if you want to see the N100 as a negative component even when it looks positive.. 
     for aa = 1:cond_n
         if S.wave_plot_conditions_together == 1
             h1 = plot(time_sel,mean_left_mag(:,aa),'Color',color_line(aa,:),'LineWidth',thc(aa),'DisplayName',S.new_cond_lab{aa}); %average waveform

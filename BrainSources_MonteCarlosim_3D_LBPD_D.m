@@ -36,7 +36,7 @@ function [ PP ] = BrainSources_MonteCarlosim_3D_LBPD_D( S )
 %                               -3th col: MCS p-value for the cluster
 %                               -4th col: cell with information about the voxels forming the cluster (e.g. stats, label and MNI coordinates)
 %           -PP is also saved on disk together with the structure S
-%           -Images with t-values for the voxels forming the significant clusters are also saved on disk
+%           -Image with t-values for the voxels forming the significant clusters are also saved on disk (now all clusters combined together in only one image)
 
 
 
@@ -48,6 +48,7 @@ function [ PP ] = BrainSources_MonteCarlosim_3D_LBPD_D( S )
 
 % leonardo.bonetti@clin.au.dk
 % Leonardo Bonetti, Aarhus, DK, 27/01/2021
+% Leonardo Bonetti, Aarhus, DK, 27/02/2023
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
@@ -115,13 +116,11 @@ if k_info_t ~= 0
         cc = find(k_info_t(d(kk),2) > dummysort); %getting a specific p-value by.. finding how many times original significant cluster was larger than permuted ones
         cc2(kk) = (length(dummysort) - length(cc))/length(dummysort); %then getting false positive (amount of simulated clusters - times when original significant cluster was larger than permuted ones) and dividing them by amount of simulated clusters
     end
-    
     %getting AAL information to provide some help to understand the results
     load(S.labels);
     %extracting AAL coordinates information
     K = nii.load(S.parcelfile);
-    
-    mkdir([S.outdir])
+    mkdir([S.outdir '/Temp'])
     %storing significant clusters and preparing output
     PP = cell(length(d)+1,4);
     PP{1,1} = 'Cluster #'; PP{1,2} = 'Cluster size'; PP{1,3} = 'MCS p-value'; PP{1,4} = 'Voxels information';
@@ -130,7 +129,7 @@ if k_info_t ~= 0
         PP(hh+1,2) = {k_info_t(d(hh),2)}; %sizes
         PP(hh+1,3) = {cc2(hh,1)}; %p-values of each cluster
         %preparing image with results to be saved for cluster dd
-        fname = [S.outdir '/' S.anal_name '_SignClust_' num2str(hh) '_Tvals.nii.gz']; %path and name
+        fname = [S.outdir '/Temp/' S.anal_name '_SignClust_' num2str(hh) '_Tvals.nii.gz']; %path and name
         V = zeros(SS(1),SS(2),SS(3));
         for jj = 1:length(Idx1t{d(hh)}) %over voxels forming the cluster dd
             V(Idx1t{d(hh)}(jj),Idx2t{d(hh)}(jj),Idx3t{d(hh)}(jj)) = T2(Idx1t{d(hh)}(jj),Idx2t{d(hh)}(jj),Idx3t{d(hh)}(jj)); %for the voxels forming the cluster dd, storing the correspondent t-values
@@ -182,6 +181,24 @@ if k_info_t ~= 0
             end
         end
         PP(hh+1,4) = {PDn}; %storing coordinates and label names
+    end
+    %Combining images with significant clusters
+    if ~isempty(d) %if there are significant clusters
+        path = [S.outdir '/Temp']; %general path
+        listt = dir([S.outdir '/Temp/*gz']); %list of images (one image for significant MEG source cluster)
+        cmd = ['fslmaths /']; %starting the command to use 'flsmaths'
+        for ll = 1:length(listt) %over images
+            if ll ~= length(listt)
+                dumo = [path(2:end) '/' listt(ll).name ' -add /']; %getting path and name of each image
+            else
+                dumo = [path(2:end) '/' listt(ll).name ' /']; %getting path and name of each image
+            end
+            cmd = strcat(cmd,dumo); %combining path of different images
+        end
+        output = [S.outdir(2:end) '/' S.anal_name '.nii.gz']; %creating output name
+        cmd = strcat(cmd,output); %final command line
+        system(cmd) %submitting command line to terminal
+        rmdir([S.outdir '/Temp'],'s') %removing temporary folder with independent images for each figure
     end
     %saving cluster results
     save([S.outdir '/' S.anal_name '_SignClust.mat'],'PP','S');

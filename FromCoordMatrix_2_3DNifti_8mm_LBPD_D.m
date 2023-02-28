@@ -85,7 +85,7 @@ if isfield(S,'singleimage')
         end
     end
 end
-if ~isfield(S,'singleimage') %this is done for historical reasons of how thid funciton has been developed.. in this way it will still work for previous scripts, although it does not look very elegant..
+if ~isfield(S,'singleimage') %this is done for historical reasons of how this funciton has been developed.. in this way it will still work for previous scripts, although it does not look very elegant..
     for iii = 1:size(data,2) %over time-points (or ROIs, etc.)
         if isfield(S,'names')
             fnamenii = [S.fname '/' S.names{iii} '.nii.gz']; %path and name of the image to be saved
