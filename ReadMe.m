@@ -158,6 +158,7 @@
 % 45)From3DNifti_OrMNICoords_2_CoordMatrix_8mm_LBPD_D
 % 46)InducedResponses_Morlet_WholeBrain_LBPD_D
 % 47)Extract_MEGSensor_Information_LBPD_D
+% 48)waveplot_groups
 
 % Additional scripts:
 % - Workbench_Codes_LocalMac_Example
