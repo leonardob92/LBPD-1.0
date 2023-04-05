@@ -29,7 +29,7 @@
 %    Communications Biology (in press)
 %    https://www.biorxiv.org/content/10.1101/2022.05.15.492038v1
 
-% The pipelines used in the above referenced studies can be found in the folder: "LeadingScripts" or in the above links provided for each paper.
+% "LeadingScripts" contains the pipeline of the above referenced studies which wait for relocation.
 
 
 % INTRODUCTION TO LBPD
