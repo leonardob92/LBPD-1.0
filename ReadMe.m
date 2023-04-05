@@ -2,32 +2,40 @@
 
 % CITATION
 % If you find LBPD functions useful, please cite the following paper(s):
-% 1) Spatiotemporal whole-brain dynamics of auditory patterns recognition
-%    L. Bonetti, E. Brattico, F. Carlomagno, J. Cabral, A. Stevner, G. Deco, P.C. Whybrow, M. Pearce, D. Pantazis, P. Vuust, M.L Kringelbach
-%    https://www.biorxiv.org/content/10.1101/2020.06.23.165191v3.full
-% 2) Bonetti, L., Brattico, E., Carlomagno, F., Donati, G., Cabral, J., Haumann, N. T., ... & Kringelbach, M. L. (2021).
+% 1) Spatiotemporal whole-brain dynamics of auditory patterns recognition. BiorXiv.
+%    Bonetti, L., Brattico, E., Carlomagno, F., Cabral, J., Stevner, A., Deco, G., Whybrow, P.C., Pearce, M., Pantazis, D., Vuust, P., Kringelbach, M.L. (2020)
+%    Pre-print: https://www.biorxiv.org/content/10.1101/2020.06.23.165191v3.full
+% 2) Bonetti, L., Brattico, E., Carlomagno, F., Donati, G., Cabral, J., Haumann, N. T., Deco, G., Vuust, P., Kringelbach, M. L. (2021).
 %    Rapid encoding of musical tones discovered in whole-brain connectivity. NeuroImage, 118735.
-%    https://www.sciencedirect.com/science/article/pii/S1053811921010077
-% 3) Brain recognition of previously learned versus novel temporal sequences: a differential simultaneous processing. Cerebral Cortex (2022).
-%    L. Bonetti, E. Brattico, S.E.P. Bruzzone, G. Donati, G. Deco, D. Pantazis, P. Vuust, M.L. Kringelbach
-%    https://www.biorxiv.org/content/10.1101/2021.10.21.465263v1
+%    Paper: https://www.sciencedirect.com/science/article/pii/S1053811921010077
+%    Leading script(s): https://github.com/leonardob92/RapidEncodingSoundsBrainConnectivityMEG_NeuroImage
+% 3) Brain recognition of previously learned versus novel temporal sequences: a differential simultaneous processing. Cerebral Cortex.
+%    Bonetti, L., Brattico, E., Bruzzone, S.E.P., Donati, G., Deco, G., Pantazis, D., Vuust, P., Kringelbach, M.L. (2022)
+%    Paper: https://academic.oup.com/cercor/advance-article/doi/10.1093/cercor/bhac439/6809237
+%    Leading script(s): https://github.com/leonardob92/Brain_Recognition_Temporal_Sequences_Differential_Simultaneous_Processing_Cerebral_Cortex
 %https://github.com/leonardob92/Brain_Recognition_Temporal_Sequences_Differential_Simultaneous_Processing_Cerebral_Cortex.git
-% 4) Bruzzone, S.E.P., Lumaca, M., Brattico, E., Vuust, P., Kringelbach, M.L., Bonetti, L. (2022).
+% 4) Bruzzone, S.E.P., Lumaca, M., Brattico, E., Vuust, P., Kringelbach, M.L., Bonetti, L. (2022)
 %    Dissociated brain functional connectivity of fast versus slow frequencies underlying individual differences in fluid intelligence: a DTI and MEG study. Scientific Reports, 12, 4746.
-%    https://www.nature.com/articles/s41598-022-08521-5
-% 5) Whole-brain computation of cognitive versus acoustic errors in music: A mismatch negativity study
-%    L. Bonetti, F. Carlomagno, M. Kliuchko, B.P. Gold, S. Palva, N.T. Haumann, M. Tervaniemi, M. Huotilainen, P. Vuust, E. Brattico
+%    Paper: https://www.nature.com/articles/s41598-022-08521-5
+%    Leading script(s): https://github.com/leonardob92/FluidIntelligenceBrainConnectivity_MEG_DTI_ScientificReports
+% 5) Whole-brain computation of cognitive versus acoustic errors in music: A mismatch negativity study.
+%    Bonetti, L., Carlomagno, F., Kliuchko, M., Gold, B.P., Palva, S., Haumann, N.T., Tervaniemi, M., Huotilainen, M., Vuust, P., Brattico, E. (2022)
 %    NeuroImage: Reports
-%    https://github.com/leonardob92/Whole_brain_computation_of_cognitive_vs_acoustic_errors_in_music_NeuroImageReports.git
-% 6) Associations between abstract working memory abilities and brain activity underlying long-term recognition of auditory sequences
-%    G. Fernández Rubio, F. Carlomagno, P. Vuust, M. L. Kringelbach, L. Bonetti
-%    PNAS Nexus, Volume 1, Issue 4, September 2022, pgac216,
-%    https://doi.org/10.1093/pnasnexus/pgac216
-%    https://github.com/gemmaferu/MEG-auditory-memory/blob/main/papers/Associations_WM_long-term_recognition_auditory_sequences.m
-% 7) The spatiotemporal dynamics of recognition memory for complex versus simple auditory sequences
-%    G. Fernández Rubio, E. Brattico, S. A. Kotz, M. L. Kringelbach, P. Vuust, L. Bonetti
-%    Communications Biology (in press)
-%    https://www.biorxiv.org/content/10.1101/2022.05.15.492038v1
+%    Paper: https://www.sciencedirect.com/science/article/pii/S2666956022000691
+%    Leading script(s): https://github.com/leonardob92/Whole_brain_computation_of_cognitive_vs_acoustic_errors_in_music_NeuroImageReports
+% 6) Associations between abstract working memory abilities and brain activity underlying long-term recognition of auditory sequences.
+%    PNAS Nexus, Volume 1, Issue 4, pgac216 (2022).
+%    Fernández Rubio, G., Carlomagno, F., Vuust, P., Kringelbach, M.L., Bonetti, L.
+%    Paper: https://doi.org/10.1093/pnasnexus/pgac216
+%    Leading script(s): https://github.com/gemmaferu/MEG-auditory-memory/blob/main/papers/Associations_WM_long-term_recognition_auditory_sequences.m
+% 7) Magnetoencephalography recordings reveal the spatiotemporal dynamics of recognition memory for complex versus simple auditory sequences
+%    Fernández Rubio, G., Brattico, E., Kotz, S.A., Kringelbach, M.L., Vuust, P., Bonetti, L. (2022)
+%    Communications Biology
+%    Paper: https://www.nature.com/articles/s42003-022-04217-8#code-availability
+%    Leading script(s): https://github.com/gemmaferu/Communications-Biology-MEG-recognition-auditory-sequences/tree/v1.0
+% 8) Revealing the spacetime hierarchical whole-brain dynamics of auditory predictive coding. BiorXiv.
+%    Bonetti, L., Fernandez Rubio, G., Carlomagno, F., Pantazis, D., Vuust, P., Kringelbach, M.L. (2022)
+%    Pre-print: https://www.biorxiv.org/content/10.1101/2022.11.19.517195v2
 
 % "LeadingScripts" contains the pipeline of the above referenced studies which wait for relocation.
 
