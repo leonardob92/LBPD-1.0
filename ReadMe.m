@@ -2,6 +2,7 @@
 
 % CITATION
 % If you find LBPD functions useful, please cite the following paper(s):
+%
 % 1) Spatiotemporal whole-brain dynamics of auditory patterns recognition. BiorXiv.
 %    Bonetti, L., Brattico, E., Carlomagno, F., Cabral, J., Stevner, A., Deco, G., Whybrow, P.C., Pearce, M., Pantazis, D., Vuust, P., Kringelbach, M.L. (2020)
 %    Pre-print: https://www.biorxiv.org/content/10.1101/2020.06.23.165191v3.full
