@@ -37,7 +37,7 @@
 %    Bonetti, L., Fernandez Rubio, G., Carlomagno, F., Pantazis, D., Vuust, P., Kringelbach, M.L. (2022)
 %    Pre-print: https://www.biorxiv.org/content/10.1101/2022.11.19.517195v2
 
-% "LeadingScripts" contains the pipeline of the above referenced studies which wait for relocation.
+% The folder "LeadingScripts" contains the pipeline of the above referenced studies which have not been published on peer-reviewed journals yet.
 
 
 % INTRODUCTION TO LBPD
