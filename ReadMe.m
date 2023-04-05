@@ -170,3 +170,4 @@
 
 % Additional scripts:
 % - Workbench_Codes_LocalMac_Example
+% - MEGSourceReconstruction_LeadFieldModel_Workshop
