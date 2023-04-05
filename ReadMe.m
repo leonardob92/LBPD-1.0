@@ -40,6 +40,9 @@
 % The folder "LeadingScripts" contains the pipeline of the above referenced studies which have not been published on peer-reviewed journals yet, but are available on BiorXiv as pre-prints.
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % INTRODUCTION TO LBPD
 % LBPD is a collection of functions for MEG brain activity and connectivity
 % data analysis.
