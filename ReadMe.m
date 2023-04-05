@@ -13,7 +13,6 @@
 %    Bonetti, L., Brattico, E., Bruzzone, S.E.P., Donati, G., Deco, G., Pantazis, D., Vuust, P., Kringelbach, M.L. (2022)
 %    Paper: https://academic.oup.com/cercor/advance-article/doi/10.1093/cercor/bhac439/6809237
 %    Leading script(s): https://github.com/leonardob92/Brain_Recognition_Temporal_Sequences_Differential_Simultaneous_Processing_Cerebral_Cortex
-%https://github.com/leonardob92/Brain_Recognition_Temporal_Sequences_Differential_Simultaneous_Processing_Cerebral_Cortex.git
 % 4) Bruzzone, S.E.P., Lumaca, M., Brattico, E., Vuust, P., Kringelbach, M.L., Bonetti, L. (2022)
 %    Dissociated brain functional connectivity of fast versus slow frequencies underlying individual differences in fluid intelligence: a DTI and MEG study. Scientific Reports, 12, 4746.
 %    Paper: https://www.nature.com/articles/s41598-022-08521-5
