@@ -30,6 +30,7 @@ O = [];
 %                                       2 = shadows.
 %                                       Do not provide field will result in dot lines.
 %                    -S.transp:         value between 0 and 1 to indicate the level of transparecny of the shadow for standard errors (meaningfull only if S.STE = 2)
+%                    -S.qq:             progressive number for creating figure qq 
 
 %  OUTPUT:           Figure
 
