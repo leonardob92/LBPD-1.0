@@ -183,5 +183,6 @@ if length(condition) == 1
     title(s)
 end
 set(gcf,'color','w')
+box on
 
 end
