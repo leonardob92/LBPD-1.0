@@ -6,16 +6,16 @@
 % 1) Spatiotemporal whole-brain dynamics of auditory patterns recognition. BiorXiv.
 %    Bonetti, L., Brattico, E., Carlomagno, F., Cabral, J., Stevner, A., Deco, G., Whybrow, P.C., Pearce, M., Pantazis, D., Vuust, P., Kringelbach, M.L. (2020)
 %    Pre-print: https://www.biorxiv.org/content/10.1101/2020.06.23.165191v3.full
-% 2) Bonetti, L., Brattico, E., Carlomagno, F., Donati, G., Cabral, J., Haumann, N. T., Deco, G., Vuust, P., Kringelbach, M. L. (2021).
-%    Rapid encoding of musical tones discovered in whole-brain connectivity. NeuroImage, 118735.
+% 2) Rapid encoding of musical tones discovered in whole-brain connectivity. NeuroImage, 118735.
+%    Bonetti, L., Brattico, E., Carlomagno, F., Donati, G., Cabral, J., Haumann, N. T., Deco, G., Vuust, P., Kringelbach, M. L. (2021).
 %    Paper: https://www.sciencedirect.com/science/article/pii/S1053811921010077
 %    Leading script(s): https://github.com/leonardob92/RapidEncodingSoundsBrainConnectivityMEG_NeuroImage
 % 3) Brain recognition of previously learned versus novel temporal sequences: a differential simultaneous processing. Cerebral Cortex.
 %    Bonetti, L., Brattico, E., Bruzzone, S.E.P., Donati, G., Deco, G., Pantazis, D., Vuust, P., Kringelbach, M.L. (2022)
 %    Paper: https://academic.oup.com/cercor/advance-article/doi/10.1093/cercor/bhac439/6809237
 %    Leading script(s): https://github.com/leonardob92/Brain_Recognition_Temporal_Sequences_Differential_Simultaneous_Processing_Cerebral_Cortex
-% 4) Bruzzone, S.E.P., Lumaca, M., Brattico, E., Vuust, P., Kringelbach, M.L., Bonetti, L. (2022)
-%    Dissociated brain functional connectivity of fast versus slow frequencies underlying individual differences in fluid intelligence: a DTI and MEG study. Scientific Reports, 12, 4746.
+% 4) Dissociated brain functional connectivity of fast versus slow frequencies underlying individual differences in fluid intelligence: a DTI and MEG study. Scientific Reports, 12, 4746.
+%    Bruzzone, S.E.P., Lumaca, M., Brattico, E., Vuust, P., Kringelbach, M.L., Bonetti, L. (2022)
 %    Paper: https://www.nature.com/articles/s41598-022-08521-5
 %    Leading script(s): https://github.com/leonardob92/FluidIntelligenceBrainConnectivity_MEG_DTI_ScientificReports
 % 5) Whole-brain computation of cognitive versus acoustic errors in music: A mismatch negativity study.
