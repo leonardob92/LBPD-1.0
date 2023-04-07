@@ -36,6 +36,10 @@
 % 8) Revealing the spacetime hierarchical whole-brain dynamics of auditory predictive coding. BiorXiv.
 %    Bonetti, L., Fernandez Rubio, G., Carlomagno, F., Pantazis, D., Vuust, P., Kringelbach, M.L. (2022)
 %    Pre-print: https://www.biorxiv.org/content/10.1101/2022.11.19.517195v2
+% 9) Brain predictive coding processes are associated to COMT gene Val158Met polymorphism. NeuroImage.
+%    Bonetti, L., Bruzzone, S.E.P., Sedghi, N.A., Haumann, N.T., Paunio, T., Kantojarvi, K., Kliuchko, M., Vuust, P., Brattico, E. (2021)
+%    Paper: https://www.sciencedirect.com/science/article/pii/S1053811921002317?via%3Dihub
+%    Leading script(s): https://github.com/leonardob92/MEG_MMN_COMT_NeuroImage
 
 % The folder "LeadingScripts" contains the pipeline of the above referenced studies which have not been published on peer-reviewed journals yet, but are available on BiorXiv as pre-prints.
 
