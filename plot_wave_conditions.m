@@ -139,6 +139,7 @@ elseif exist('ylims','var') == 1
 end
 xlim(S.x_lim);
 grid minor
+box on
 %Set axis labels
 xlabel('ms')
 %         ylabel('fT')

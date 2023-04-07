@@ -379,6 +379,7 @@ if S.waveform_singlechannels_label == 1
                     end
                     %                     grid on
                     grid minor
+                    box on
                 end
                 legend([legendv],legcell) %same..
                 legend('show');
@@ -386,6 +387,7 @@ if S.waveform_singlechannels_label == 1
                 set(gcf,'Color','w')
                 grid on
                 grid minor
+                box on
             end
         end
     end
@@ -662,6 +664,7 @@ if S.waveform_average_label == 1
     grid on
     grid minor
     set(gcf,'Color','w')
+    box on
     if S.legc == 1
         legend([legendv],legcell) %same..
         legend('show');
@@ -752,6 +755,7 @@ if S.waveform_average_label == 1
                 %additional plottin details
                 grid on
                 grid minor
+                box on
                 if S.legc == 1
                     legend('show');
                 end

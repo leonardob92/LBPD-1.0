@@ -189,6 +189,7 @@ if sum(double(S.chans_index)) == 0 %if S.chans_index = 0, plot the waveform at a
                     end
                 end
                 grid minor
+                box on
                 if S.legendl == 1
                     legend('show');
                 end
@@ -307,6 +308,7 @@ elseif S.chans_index>0 %if channel index is specified, plot waveform at that cha
             xlim(S.x_lim);
         end
         grid minor
+        box on
         %Set axis labels
         xlabel('s')
 %         ylabel('fT')
