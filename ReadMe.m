@@ -40,6 +40,10 @@
 %    Bonetti, L., Bruzzone, S.E.P., Sedghi, N.A., Haumann, N.T., Paunio, T., Kantojarvi, K., Kliuchko, M., Vuust, P., Brattico, E. (2021)
 %    Paper: https://www.sciencedirect.com/science/article/pii/S1053811921002317?via%3Dihub
 %    Leading script(s): https://github.com/leonardob92/MEG_MMN_COMT_NeuroImage
+% 10)Moderate associations between BDNF Val66Met gene polymorphism, musical expertise, and mismatch negativity. Heliyon.
+%    Bonetti, L., Bruzzone, S.E.P., Paunio, T., Kantojarvi, K., Kliuchko, M., Vuust, P., Palva, S., Brattico, E. (2023).
+%    Paper: in press
+%    Leading script(s): https://github.com/leonardob92/BDNF_MMN_MusicalTraining_Heliyon.git
 
 % The folder "LeadingScripts" contains the pipeline of the above referenced studies which have not been published on peer-reviewed journals yet, but are available on BiorXiv as pre-prints.
 
