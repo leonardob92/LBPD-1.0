@@ -15,7 +15,8 @@ O = [];
 %                    -S.gsubj:          cell containing the indices of the subjects. Each vector contains the
 %                                       indices of the subjects belonging to one of the groups.
 %                                       !! The order of the vectors must correspond to the order of the group labels!!
-%                    -S.signtp:         cell array (ROIs x conditions) with significant time points (in seconds (clusters x time (begin and end))).
+%                    -S.signtp:         cell array (maximum 1 x 1 because it makes no sense to plot significant time-windows if you have more than one condition or ROI within one single plot..)
+%                                       The significant time points are in seconds (clusters x time (begin and end)).
 %                                       Leave empty for not plotting any significant time-window.
 %                    -S.legendl:        set 1 for having the legend; 0 otherwise
 %                    -S.x_lim:          Set temporal (x) limits in s
@@ -80,9 +81,6 @@ patch_color = [.85 .85 .85]; % Color of grey box marking time-ranges
 cnt = 0;
 for cc = 1:length(condition) %over conditions
     for ii = 1:length(roin) %over ROIs
-        if ~isempty(signtp)
-            sgf1 = signtp{ii,cc}; %extracting clusters for ROIs ii and condition cc
-        end
         for gg = 1:length(glab)
             cnt = cnt + 1;
             %mean
@@ -122,6 +120,9 @@ end
 
 close all
 %plotting greay areas to show significant time-points
+if ~isempty(signtp)
+    sgf1 = signtp{1,1}; %extracting clusters for ROIs ii and condition cc
+end
 if ~isempty(signtp)
     for iii = 1:size(sgf1,1) %over significant clusters
         sgf2 = sgf1(iii,:); %extracting cluster iii
