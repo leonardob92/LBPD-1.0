@@ -178,6 +178,7 @@
 % 46)InducedResponses_Morlet_WholeBrain_LBPD_D
 % 47)Extract_MEGSensor_Information_LBPD_D
 % 48)waveplot_groups_server_LBPD (waveplot_groups_local for local computers and not Aarhus server)
+% 49)waveform_plotting_local (waveplot_local for local computers and not Aarhus server)
 
 % Additional scripts:
 % - Workbench_Codes_LocalMac_Example
