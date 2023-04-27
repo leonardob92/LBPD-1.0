@@ -36,6 +36,10 @@ O = [];
 %                                   1 = simple difference of means over subjects
 %                                   2-3-4 = two-sample t-tests,
 %                                   %%% MAYBE ALWASYS COMPUTE T-VALUES %%%
+%           -S.subave:             cell matrix with requested subaverages in the first row (e.g. S.subave{1,1} = [1 3]; S.subave{1,2} = [2 4 5];
+%                                  S.subave{1,3} = [6,8]; subaverages conditions 1 and 3, 2, 4 and 5, etc.).
+%                                  Names in the second row (e.g. S.subave{2,1} = 'name1'; S.subave{2,2} = 'name2'; etc.).                                 
+%                                  Leave empty S.subave = [] or do not provide field for no subaveraging.
 %           -S.Aarhus_clust:       1 to use paralle computing (Aarhus University, contact me, Leonardo Bonetti, for more information)
 %                                  leonardo.bonetti@clin.au.dk
 
@@ -51,6 +55,7 @@ O = [];
 
 % leonardo.bonetti@clin.au.dk
 % Leonardo Bonetti, Aarhus, DK, 06/03/2021
+% Leonardo Bonetti, Oxford, UK, 27/04/2023
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
@@ -73,6 +78,7 @@ end
 %getting a few inputs
 sensl = S.sensl;
 workingdir = S.workingdir;
+mkdir(workingdir)
 %MAIN EFFECTS CONDITIONS
 if ~isfield(S,'list') || isempty(S.list)
     list = dir([workingdir '/SUBJ*mat']);
@@ -111,6 +117,23 @@ for ii = 1:length(list) %over subjects
 end
 disp('computing and saving main effects - MEG sources and sensors')
 SR(SR==0) = NaN; %if not all subjects had all conditions, replacing 0s with NaNs
+
+
+%%% OBS!! %%%
+%%% HERE I ALLOW TO DO SUBAVERAGES OF CONDITONS FOR MAIN EFFECT; THIS IS FINE BUT NOT GREATLY OPTIMIZED SINCE THE CODES ALREADY WORKED FOR DOING SUBAVERAGE BEFORE THE CONTRASTS..
+%%% YOU SHOULD CONSIDER MAKE IT BETTER.. AND MAYBE REMOVE THE MEG SENSOR DATA FROM HERE.. %%%
+if isfield(S,'subave') %this is to allow previous scripts to still work even if S.subave is not specified
+    if ~isempty(S.subave) %if user requested subaveraging
+        DUM = zeros(SS_s(1),SS_s(2),length(S.subave),length(list));
+        for ii = 1:size(S.subave,2) %over requested subaverages
+            DUM(:,:,ii,:) = mean(SR(:,:,S.subave{1,ii},:),3); %subaveraging set of conditions ii
+        end
+        SR = DUM;
+        clear DUM
+    end
+end
+%%% UNTIL HERE %%%
+
 SRm = mean(SR,4,'omitnan'); %average over subjects
 SRst = std(SR,0,4,'omitnan'); %computing standard deviations
 
@@ -174,9 +197,15 @@ if S.plot_nifti == 1
     end
     disp('%%%%% V - PRINTING NIFTI IMAGE(s) %%%%%')
     warning('loading MNI152-T1 8mm brain newly sorted set of coordinates.. remember that if you want a different spatial resolution (e.g. 2mm), you need to create a new mask and update this line of code!!')
-%     maskk = load_nii('/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External/MNI152_8mm_brain_diy.nii.gz'); %getting the mask for creating the figure
-    for iii = 1:length(OUT.S.inversion.conditions) %over experimental conditions
-        fnamenii = [workingdir '/' pnn '_cond_' OUT.S.inversion.conditions{iii} '_abs_' num2str(OUT.S.inversion.abs) '.nii.gz']; %path and name of the image to be saved
+    %     maskk = load_nii('/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External/MNI152_8mm_brain_diy.nii.gz'); %getting the mask for creating the figure
+    for iii = 1:size(SR,3) %length(OUT.S.inversion.conditions) %over experimental conditions
+        if isfield(S,'subave') %this is to allow previous scripts to still work even if S.subave is not specified
+            if ~isempty(S.subave) %if user requested subaveraging
+                fnamenii = [workingdir '/' pnn '_cond_' S.subave{2,iii} '_abs_' num2str(OUT.S.inversion.abs) '.nii.gz']; %path and name of the image to be saved
+            else
+                fnamenii = [workingdir '/' pnn '_cond_' OUT.S.inversion.conditions{iii} '_abs_' num2str(OUT.S.inversion.abs) '.nii.gz']; %path and name of the image to be saved
+            end
+        end
         SO = t_val_s(:,:,iii);
         %building nifti image
         SS = size(maskk.img);
