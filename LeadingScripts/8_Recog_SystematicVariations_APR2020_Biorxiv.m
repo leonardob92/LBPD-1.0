@@ -2604,8 +2604,8 @@ addpath('/Users/au550322/Documents/AarhusUniversitet/Postdoc/DataCollection_Audi
 
 ROI = 1; %only 1 channel/ROI
 condition = [1:5]; %1 = Old; 2 = NewT1; 3 = NewT2; 4 = NewT3; 5 = NewT4;
-ylimm = []; %amplitude limits; leave empty [] for automatic adjustment
-export_l = 0; %1 = export images; 0 = not
+ylimm = [-200 100]; %amplitude limits; leave empty [] for automatic adjustment
+export_l = 1; %1 = export images; 0 = not
 
 clear ROIN
 S = [];
@@ -2619,12 +2619,13 @@ S.data = data2(:,1:1026,:,:);
 S.STE = 2; %1 = dot lines for standard error; 2 = shadows
 S.transp = 0.4; %transparency for standard errors shadow
 S.time_real = time_sel(1:1026);
-S.colorline = [0.8 0.56 0.56; 0.47 0.53 0.6; 0.78 0.67 0.33; 0.8 0.33 0.2; 0.7 0.6 0.8];
-S.colorline = [0 0.6 1; 1 0.4 0; 1 0 0; 0 0 0; 0 0 0.7; 0.6 0.2 0.6]
+% S.colorline = [0.8 0.56 0.56; 0.47 0.53 0.6; 0.78 0.67 0.33; 0.8 0.33 0.2; 0.7 0.6 0.8];
+% S.colorline = [1 0 0; 0 0.6 1; 0 0.3 1; 0 0 0.7; 0 0 0.2];
+S.colorline = [1 0 0; 0.3686 0.6314 0.7412; 0.1882 0.4902 0.8118; 0.0784 0.1569 0.5255; 0 0 0];
 if export_l == 1
     S.legendl = 0;
 else
-    S.legendl = 1;
+    S.legendl = 0;
 end
 S.x_lim = [-0.1 3.4]; % Set x limits
 S.y_lim = ylimm; %Set y limits
@@ -2636,15 +2637,15 @@ S.signtp = [];
 waveform_plotting_local(S) %actual function
 
 if export_l == 1
-    exportgraphics(gcf,['/Users/au550322/Documents/AarhusUniversitet/Postdoc/DataCollection_AuditoryPatternRecognition2020/Papers/SystematicVariationSequence/Codes_Images_Local/FinalImage/MEGsensor.pdf'],'Resolution',300)
+    exportgraphics(gcf,['/Users/au550322/Documents/AarhusUniversitet/Postdoc/DataCollection_AuditoryPatternRecognition2020/Papers/SystematicVariationSequence/Codes_Images_Local/FinalImages/MEGsensor.pdf'],'Resolution',300)
 end
 
 %% Decoding (multivariate pattern analysis)
    
 ROI = 1; %only 1 channel/ROI
 condition = [0]; %1 = Old vs NewT1; 2 = Old vs NewT2; 3 = Old vs NewT3; 4 = Old vs NewT4; 0 = All together
-ylimm = []; %amplitude limits; leave empty [] for automatic adjustment
-export_l = 0; %1 = export images; 0 = not
+ylimm = [40 70]; %amplitude limits; leave empty [] for automatic adjustment
+export_l = 1; %1 = export images; 0 = not
 
 clear ROIN
 load('/Users/au550322/Documents/AarhusUniversitet/Postdoc/DataCollection_AuditoryPatternRecognition2020/Papers/SystematicVariationSequence/Codes_Images_Local/time.mat'); %loading time
@@ -2661,6 +2662,7 @@ if condition > 0
     end
     S.signtp = sgf;
     S.condition_n = 1;
+    S.colorline = [0 0 0];
 else
     S.conds = {'M vs NT1','M vs NT2','M vs NT3','M vs NT4'};
     data2 = zeros(1,1026,82,4);
@@ -2675,13 +2677,13 @@ else
     S.data = data2;
     S.signtp = [];
     S.condition_n = [1:4];
+    S.colorline = [0.3686 0.6314 0.7412; 0.1882 0.4902 0.8118; 0.0784 0.1569 0.5255; 0 0 0];
 end
 ROIN{1} = 'MEG';
 %structure for the function
-S.STE = 1; %1 = dot lines for standard error; 2 = shadows
+S.STE = 2; %1 = dot lines for standard error; 2 = shadows
 S.transp = 0.3; %transparency for standard errors shadow
 S.time_real = time_sel(1:1026);
-S.colorline = [0 0 0.502; 0.702 0 0; 0 0.55 1; 1 0.2 0.2];
 if export_l == 1
     S.legendl = 0;
 else
@@ -2695,17 +2697,21 @@ S.ROIs_labels = ROIN(ROI);
 waveform_plotting_local(S) %actual function
 
 if export_l == 1
-    exportgraphics(gcf,['/Users/au550322/Documents/AarhusUniversitet/Postdoc/DataCollection_AuditoryPatternRecognition2020/Papers/SystematicVariationSequence/Codes_Images_Local/FinalImage/Dec_O_NT' num2str(ii) '.pdf'],'Resolution',300)
+    exportgraphics(gcf,['/Users/au550322/Documents/AarhusUniversitet/Postdoc/DataCollection_AuditoryPatternRecognition2020/Papers/SystematicVariationSequence/Codes_Images_Local/FinalImages/Decoding_O_NT' num2str(condition) '.pdf'],'Resolution',300)
 end
 
 %% MEG SOURCES
 
-ROI = 1; %only 1 channel/ROI
-ylimm = []; %amplitude limits; leave empty [] for automatic adjustment
+ROI = 1; %ROIs (they are 6)
 condition = [1:5]; %1 = Old; 2 = NewT1; 3 = NewT2; 4 = NewT3; 5 = NewT4;
-export_l = 0; %1 = export images; 0 = not
+export_l = 1; %1 = export images; 0 = not
 
 clear ROIN
+if ROI > 4
+    ylimm = [-60 20]; %amplitude limits; leave empty [] for automatic adjustment
+else
+    ylimm = [-38 23]; %amplitude limits; leave empty [] for automatic adjustment
+end
 S = [];
 S.conds = {'Old ','NewT1','NewT2','NewT3','NewT4'};
 ROIN{1} = 'MC'; ROIN{2} = 'HITR'; ROIN{3} = 'HITL'; ROIN{4} = 'VMPFC'; ROIN{5} = 'ACL'; ROIN{6} = 'ACR';
@@ -2713,12 +2719,12 @@ load('/Users/au550322/Documents/AarhusUniversitet/Postdoc/DataCollection_Auditor
 load('/Users/au550322/Documents/AarhusUniversitet/Postdoc/DataCollection_AuditoryPatternRecognition2020/Papers/SystematicVariationSequence/Codes_Images_Local/time.mat'); %loading time
 %structure for the function
 data2 = dum2;
-data2 = reshape(data2,[size(data2,1) size(data2,2) size(data2,4) size(data2,3)]);
+data2 = permute(data2,[1 2 4 3]);
 S.data = data2(:,1:1026,:,:);
-S.STE = 1; %1 = dot lines for standard error; 2 = shadows
+S.STE = 2; %1 = dot lines for standard error; 2 = shadows
 S.transp = 0.3; %transparency for standard errors shadow
 S.time_real = time_sel(1:1026);
-S.colorline = [0 0 0.502; 0.702 0 0; 0 0.55 1; 1 0.2 0.2; 1 0 0];
+S.colorline = [1 0 0; 0.3686 0.6314 0.7412; 0.1882 0.4902 0.8118; 0.0784 0.1569 0.5255; 0 0 0];
 if export_l == 1
     S.legendl = 0;
 else
@@ -2734,5 +2740,5 @@ S.signtp = [];
 waveform_plotting_local(S) %actual function
 
 if export_l == 1
-    exportgraphics(gcf,['/Users/au550322/Documents/AarhusUniversitet/Postdoc/DataCollection_AuditoryPatternRecognition2020/Papers/SystematicVariationSequence/Codes_Images_Local/FinalImage/ROI_' ROIN{ROI} '.pdf'],'Resolution',300)
+    exportgraphics(gcf,['/Users/au550322/Documents/AarhusUniversitet/Postdoc/DataCollection_AuditoryPatternRecognition2020/Papers/SystematicVariationSequence/Codes_Images_Local/FinalImages/ROI_' ROIN{ROI} '.pdf'],'Resolution',300)
 end
