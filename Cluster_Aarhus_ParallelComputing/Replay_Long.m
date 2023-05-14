@@ -30,7 +30,7 @@ if labell == 1
 %     saveas(gcf,'/scratch7/MINDLAB2022_MEG-EncodingMusicSeq/gemma/loc_alltones2.png')
 elseif labell == 2
     
-    block = 1; %1 = auditory vs visual numbers; 2 = auditory numbers vs rest; 3 = visual numbers vs rest
+    block = 2; %1 = auditory vs visual numbers; 2 = auditory numbers vs rest; 3 = visual numbers vs rest
     
     if block == 1
         list_TG = dir('/scratch7/MINDLAB2021_MEG-TempSeqAges/leonardo/after_maxfilter/decoding_replay/Aud_vs_Vis/TG*.mat');
@@ -51,7 +51,7 @@ elseif labell == 2
     colorbar %add colorbar
     set(gcf,'Color','w')
     if block == 1
-            save('/scratch7/MINDLAB2021_MEG-TempSeqAges/leonardo/after_maxfilter/decoding_replay/Aud_vs_Vis/TG_MemList_average.mat','ddTGm');
+        save('/scratch7/MINDLAB2021_MEG-TempSeqAges/leonardo/after_maxfilter/decoding_replay/Aud_vs_Vis/TG_MemList_average.mat','ddTGm');
 %         export_fig('/scratch7/MINDLAB2021_MEG-TempSeqAges/leonardo/after_maxfilter/decoding_replay/Aud_vs_Vis.png')
 %         saveas(gcf,'/scratch7/MINDLAB2021_MEG-TempSeqAges/leonardo/after_maxfilter/decoding_replay/Aud_vs_Vis.png')
     elseif block == 2
@@ -70,6 +70,29 @@ elseif labell == 3
     end
     ddTGm = mean(dd1,3); %average participants
     save('/scratch7/MINDLAB2020_MEG-AuditoryPatternRecognition/leonardo/after_maxfilter_v2/decoding_replay_samemel_visualpat/TG_average.mat','ddTGm');
+elseif labell == 4
+    
+    mell = 2; %1 = melody; 0 = rhythm
+    
+    if mell == 1
+        list_TG = dir(['/scratch7/MINDLAB2022_MEG-EncodingMusicSeq/gemma/decoding/Melody/TG*']); %list of TG files
+        load('/scratch7/MINDLAB2022_MEG-EncodingMusicSeq/gemma/decoding/Melodytime.mat'); %time in seconds
+    else
+        list_TG = dir(['/scratch7/MINDLAB2022_MEG-EncodingMusicSeq/gemma/decoding/Rhythm/TG*']); %list of TG files
+        load('/scratch7/MINDLAB2022_MEG-EncodingMusicSeq/gemma/decoding/Rhythmtime.mat'); %time in seconds
+    end
+    dd1 = zeros(length(time_sel),length(time_sel),length(list_TG)); %preallocate variable dd1 (time samples and TG files)
+    for ff = 1:length(list_TG) %over TG files
+        load([list_TG(ff).folder '/' list_TG(ff).name]); %load TG file
+        dd1(:,:,ff) = d.d; %save d structure
+        disp(ff)
+    end
+    ddTGm = mean(dd1,3); %average participants
+    if mell == 1
+        save('/scratch7/MINDLAB2022_MEG-EncodingMusicSeq/gemma/decoding/TG_mel_listmem_average.mat','ddTGm');
+    else
+        save('/scratch7/MINDLAB2022_MEG-EncodingMusicSeq/gemma/decoding/TG_rhy_listmem_average.mat','ddTGm');
+    end
 end
 
 
