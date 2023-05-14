@@ -41,9 +41,7 @@ O = [];
 
 
 
-%%% TO BE TESTED!! %%
-
-list_TG = S.list_TG;
+list_TG = S.list_TG; %list of subjects
 load([list_TG(1).folder '/' list_TG(1).name]); %load TG file
 SS = size(d.d);
 dd1 = zeros(SS(1),SS(2),length(list_TG)); %preallocate variable dd1 (time samples and TG files)
@@ -56,9 +54,9 @@ ddTGm = mean(dd1,3); %mean over subjects
 if isfield(S,'name')
     name = S.name;
 else
-    name = 'TG_Average');
+    name = 'TG_Average';
 end
-
+save([S.output '/' name '.mat'],'ddTGm');
 if S.stat == 1 %
     %functions for Dimitrios' codes (decoding and statistics)
     addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Decoding')
@@ -75,15 +73,15 @@ if S.stat == 1 %
     pathl = '/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD'; %path to stored functions
     addpath(pathl);
     LBPD_startup_D(pathl);
-    
     %computing statistics and plotting results
+    %reshaping temporal generalization decoding acuracy for submitting it to statistical testing
+    ddTG2 = dd1(1:SS(1),1:SS(2),:) - 50; %subtracting 50 since the function tests significance against 0 (here represented by 50% chance level)
+    dat = cell(1,size(ddTG2,3));
+    for ii = 1:size(ddTG2,3)
+        dat(1,ii) = {ddTG2(:,:,ii)};
+    end
+    %actual function for the statistics
     stat = pl_permtest(dat,'alpha',0.05); %actual function
-    %         time_selj = time_sel(1:776);
-    %         figure; imagesc(time_selj,time_selj,stat.statmap); xlabel('Train time (s)'); ylabel('Test time (s)'); set(gca,'YDir','normal');
-    %         colorbar
-    %         set(gcf,'Color','w')
-    %         caxis([-5 10])
-    
     %testing contrast results (correcting for multiple comparison) by performing Monte Carlo simulations
     P2 = zeros(size(stat.statmap,1),size(stat.statmap,2));
     statt = stat.statmap;
@@ -93,16 +91,12 @@ if S.stat == 1 %
     threshMC = 0.001;
     perm_max = 1;
     t1 = S.time; t2 = t1;
-    
     [ OUT ] = twoD_MCS_LBPD_D( P2, thresh, permut, threshMC, perm_max, t1 , t2 );
-    
+    %preparing output
     PDn = cell2table(OUT); %table
-    writetable(PDn,[S.output '/' name '.xlsx'],'Sheet',1); %printing excel file
-    save([S.output '/' name '.mat'],'ddTGm','stat','OUT'); %saving averaged TG matrix, statistics and significant clusters
-else %otherwise saving only average TG matrix 
-    save([S.output '/' name '.mat'],'ddTGm');
+%     writetable(PDn,[S.output '/' name '.xlsx'],'Sheet',1); %printing excel file
+    save([S.output '/' name '.mat'],'ddTGm','stat','OUT','PDn'); %saving averaged TG matrix, statistics and significant clusters
 end
-
 
 end
 
