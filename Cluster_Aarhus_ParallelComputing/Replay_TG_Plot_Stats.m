@@ -42,6 +42,7 @@ O = [];
 
 
 list_TG = S.list_TG; %list of subjects
+time = S.time;
 load([list_TG(1).folder '/' list_TG(1).name]); %load TG file
 SS = size(d.d);
 dd1 = zeros(SS(1),SS(2),length(list_TG)); %preallocate variable dd1 (time samples and TG files)
@@ -56,7 +57,7 @@ if isfield(S,'name')
 else
     name = 'TG_Average';
 end
-save([S.output '/' name '.mat'],'ddTGm');
+save([S.output '/' name '.mat'],'ddTGm','time');
 if S.stat == 1 %
     %functions for Dimitrios' codes (decoding and statistics)
     addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Decoding')
@@ -95,7 +96,7 @@ if S.stat == 1 %
     %preparing output
     PDn = cell2table(OUT); %table
 %     writetable(PDn,[S.output '/' name '.xlsx'],'Sheet',1); %printing excel file
-    save([S.output '/' name '.mat'],'ddTGm','stat','OUT','PDn'); %saving averaged TG matrix, statistics and significant clusters
+    save([S.output '/' name '.mat'],'ddTGm','time','stat','OUT','PDn'); %saving averaged TG matrix, statistics and significant clusters
 end
 
 end
