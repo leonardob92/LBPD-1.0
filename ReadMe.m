@@ -65,7 +65,8 @@
 % I do not want to take any credit for those functions and I deeply thank
 % the brilliant scientists that developed them and made them publicly
 % available.
-% If you notice any mistake, typo, etc. in the codes, please feel free to
+% The quality of the code is decent, but several parts will be better commented and optimised.
+% In the meanwhile, if you notice any mistake, typo, etc. in the codes, please feel free to
 % contact me and I will fix/clarify them. The codes should work, but they
 % are constantly been updated and improved.
 % If you notice that I did not properly acknowledge the contribution of
