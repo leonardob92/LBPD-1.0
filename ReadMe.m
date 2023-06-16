@@ -44,8 +44,11 @@
 %    Bonetti, L., Bruzzone, S.E.P., Paunio, T., Kantojarvi, K., Kliuchko, M., Vuust, P., Palva, S., Brattico, E. (2023).
 %    Paper: https://www.sciencedirect.com/science/article/pii/S2405844023028074
 %    Leading script(s): https://github.com/leonardob92/BDNF_MMN_MusicalTraining_Heliyon.git
+% 11)Revealing the spacetime hierarchical whole-brain dynamics of auditory predictive coding. BiorXiv.
+%    Bonetti, L., Fernández Rubio, G., Carlomagno, F., Pantazis, D., Vuust, P., Kringelbach, M.L. (2023).
+%    Paper: https://www.biorxiv.org/content/10.1101/2022.11.19.517195v3
 
-% The folder "LeadingScripts" contains the pipeline of the above referenced studies which have not been published on peer-reviewed journals yet, but are available on BiorXiv as pre-prints.
+% The folder "LeadingScripts" contains the pipeline of the above referenced study number 1).
 
 
 
