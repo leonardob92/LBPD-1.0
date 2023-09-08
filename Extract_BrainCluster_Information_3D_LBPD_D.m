@@ -48,8 +48,12 @@ VI = find(V~=0); %indices of non-zero values of nifti image
 parcelfile = '/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External/aal_8mm_try5.nii.gz'; %path to AAL template %load this from the provided codes folder
 load('/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External/AAL_labels.mat'); %loading AAL labels %load this from the provided codes folder
 K = nii.load(parcelfile); %extracting AAL coordinates information
-%sorting results in order to have strongest voxels at the top (positive t-values) or at the bottom (negative t-values)
-[VV2, II] = sort(VV,'descend');
+%sorting results in order to have strongest voxels (in absolute terms) at the top
+if abs(max(VV)) > abs(min(VV)) %if positive t-values are bigger in absolute terms than negative t-values
+    [VV2, II] = sort(VV,'descend'); %positive t-values on top
+else
+    [VV2, II] = sort(VV,'ascend'); %otherwise negative t-values on top
+end
 VI = VI(II);
 mni_coords = mni_coords(II,:);
 PD = cell(length(VV2)+2,6);  %final cell

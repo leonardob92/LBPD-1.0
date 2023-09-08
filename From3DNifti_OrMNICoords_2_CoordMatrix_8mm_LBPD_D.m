@@ -94,11 +94,18 @@ elseif S.input == 2
         dum = find(aalt == AAL_ROIs(ii)); %getting the indices of the selected AAL ROIs
         idx = cat(1,idx,maskt(dum)); %getting the correspondent indices of the mask upon which is based the source reconstruction (and therefore the data)
     end
+    if isempty(idx) || sum(idx) == 0 %if no correspondance is found (it can happen if the ROI is very smal and has e.g. only 1 voxel which does not perfectly align with my template)
+        cnt = 0;
+        while isempty(idx) || sum(idx) == 0  %in case it happens, I look for the nearest voxel which matches my template (this small imprecision is negligible with MEG)
+            cnt = cnt + 1;
+            idx = cat(1,idx,maskt(dum+cnt));
+        end
+    end
     idx(idx==0) = []; %removing the few voxels that couldn't be indexed since the AAL ROIs and the mask used slightly different approximations and therefore a few voxels do not perfectly correspond (with MEG spatial resolution it does not really matter)
 elseif S.input == 3 %case with general image
     IMG = load_nii(S.image);
     imgdum = IMG.img; %extracting matrix with the values shown in the image
-    mask = load_nii('/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External/MNI152_8mm_brain_diy.nii.gz'); %loading AAL nifti image
+    mask = load_nii('/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External/MNI152_8mm_brain_diy.nii.gz'); %loading nifti image
     maskt = mask.img; %extracting matrix with the values shown in the image
     dum = find(imgdum ~= 0); %getting the indices of the non-zero voxels
     idx = zeros(length(dum),2);
