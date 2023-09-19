@@ -10,7 +10,7 @@ function idx = From3DNifti_OrMNICoords_2_CoordMatrix_8mm_LBPD_D( S )
 %                           2 = AAL ROIs e.g. [45 50 89];
 %                           3 = general image with non-zero values (provided as a nifti image)
 %           -S.coordd:      MNI coordinates x y z, e.g. [-45 -32 6]
-%           -S.AAL_ROIs:    AAL ROIs numbers you want to use, e.g. [45 50 89];
+%           -S.AAL_ROIs:    AAL ROIs numbers you want to use, e.g. [45 50 89] (the order is LRLRLR..);
 %           -S.image:       path to nifti image with non-zero values
 
 % OUTPUT:   -idx:           vector with LBPD coordinates (in case of
