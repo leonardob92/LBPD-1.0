@@ -33,6 +33,7 @@ function [ OUT ] = twoD_MCS_LBPD_D( P, thresh, permut, threshMC, perm_max, t1, t
 %                            -maximum along first dimension (row)
 %                            -minimum along second dimension (column)
 %                            -maximum along second dimension (column)
+%                           In addition, in the first row of the eight column a matrix with significant elements is stored (useful for plotting purposes) 
 
 
 
@@ -116,6 +117,7 @@ for pp = 1:permut %over total number of permutations
     else
         CH = cat(1,CH,hjk); %or all cluster sizes
     end
+    disp(pp)
 end
 if perm_max == 0
     NSVR = CH;
@@ -157,6 +159,12 @@ for ii = 1:size(NS3,1)
     OUT(ii,6) = {t2(min(dJ))}; %min for t2 dimension
     OUT(ii,7) = {t2(max(dJ))}; %max for t2 dimension
 end
+%creating a binary matrix with 1s for significant time-frequency elements after MCS correction
+AG2 = zeros(size(AG,1),size(AG,2));
+for ii = 1:size(NS3,1) %over significant clusters
+   AG2(AG==NS3(ii,1)) = 1; %assigning one to the numbers coding the significant clusters in the original cluster matrix AG
+end
+OUT(1,8) = {AG2}; %storing matrix
 
 end
 

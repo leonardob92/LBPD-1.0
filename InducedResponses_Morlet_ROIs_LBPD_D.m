@@ -17,8 +17,7 @@ O = [];
 
 % INPUT:    -S.ROI_n:           number of ROI to be used (coherently with the ROIs order reported in S.mask)
 %           -S.f:               frequencies to be used by Morlet
-%           -S.mask:            path (including file) to a binary matrix (sources x ROIs) where 1s indicate
-%                               the voxels to be taken into account.
+%           -S.mask:            binary (0 and 1) matrix (sources x ROIs) where 1s indicate the voxels to be taken into account.
 %                               Voxels order is connected to LBPD system of coordinates.
 %           -S.subjlist:        list of subjects (output of LBPD source reconstruction)
 %           -S.time:            vector of time in seconds (it assumes the source reconstructed data has the same time.
@@ -58,16 +57,16 @@ addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Brai
 %extracting information
 ROI_n = S.ROI_n;
 f = S.f;
-load(S.mask);
+maskk = S.mask;
 list = S.subjlist;
 time = S.time;
-dop = length(find(ROIs_DCM(:,ROI_n)==1));
+dop = length(find(maskk(:,ROI_n)==1));
 if S.single_subj == 0
     load([list(1).folder '/' list(1).name]);
     P3 = zeros(length(f),length(time),length(OUT.sources_ERFs),length(list)); %frequencies x time-points x conditions x subjects
 end
 %setting up the cluster
-if S.Aarhus_clust ==1
+if S.Aarhus_clust == 1
     addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/Cluster_ParallelComputing') %add the path to the function that submits the jobs to the cluster
     clusterconfig('scheduler', 'cluster'); % 'none' or 'cluster'
     clusterconfig('long_running', 1); %there are different queues for the cluster depending on the number and length of the jobs you want to submit
@@ -75,17 +74,20 @@ if S.Aarhus_clust ==1
 end
 %actual computation (or jobs submission)
 for ii = 1:length(list)
-    if S.Aarhus_clust == 0
+    if S.Aarhus_clust == 1
+        S.ii = ii;
+        jobid = job2cluster(@InducedResponses_Morlet_ROIs_AarhusClust,S);
+    else
         disp(['loading data for subject ' num2str(ii)])
-%         if ii ~= 1 %you alredy loaded subject 1
-            load([list(ii).folder '/' list(ii).name]);
-%         end
+        %         if ii ~= 1 %you alredy loaded subject 1
+        load([list(ii).folder '/' list(ii).name]);
+        %         end
         if S.single_subj == 1
             Psubj = zeros(length(f),length(time),length(OUT.sources_ERFs)); %frequencies x time-points x conditions
         end
         for cc = 1:length(OUT.sources_ERFs) %over conditions
             dum = OUT.sources_ERFs{cc}; %getting single trial data for Old correct
-            data = dum(ROIs_DCM(:,ROI_n)==1,:,:); %getting single voxels for VMPFC
+            data = dum(maskk(:,ROI_n)==1,:,:); %getting single voxels for VMPFC
             P2 = zeros(length(f),length(time),size(dum,3));
             for xx = 1:size(dum,3) %over trials
                 %             P = zeros(length(f),length(time),dop);
@@ -109,9 +111,6 @@ for ii = 1:length(list)
             save([S.outdir(1:end-4) '_' list(ii).name(1:9) '.mat'],'Psubj','time','f','S');
         end
         clear OUT P2 Pdum data dum Psubj
-    else
-        S.ii = ii;
-        jobid = job2cluster(@InducedResponses_Morlet_ROIs_AarhusClust,S);
     end
 end
 if S.single_subj == 0
