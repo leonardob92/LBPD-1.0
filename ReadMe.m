@@ -47,9 +47,15 @@
 % 11)Revealing the spacetime hierarchical whole-brain dynamics of auditory predictive coding. BiorXiv.
 %    Bonetti, L., Fernández Rubio, G., Carlomagno, F., Pantazis, D., Vuust, P., Kringelbach, M.L. (2023).
 %    Paper: https://www.biorxiv.org/content/10.1101/2022.11.19.517195v3
+%    Leading script (s): https://github.com/leonardob92/HierarchicalPredictiveCoding_Music_MEG.git
 % 12)Challenging age-related decline in brain function: Evidence from fast neuroimaging of musical sequence recognition. BiorXiv.
 %    Bonetti, L., Fernández Rubio, G., Lumaca, M., Carlomagno, F., Risgaard Olsen, E., Criscuolo, A., Kotz, S.A., Vuust, P., Brattico, E., & Kringelbach, M.L. (2023).
 %    Paper: https://www.biorxiv.org/content/10.1101/2023.07.13.548815v1
+%    Leading script (s): https://github.com/leonardob92/MEG_Aging_Bach.git
+% 13)Neurophysiological correlates of short-term recognition of sounds: Insights from magnetoencephalography. BiorXiv.
+%    Serra, E., Lumaca, M., Brattico, E., Vuust, P., Kringelbach, M. L., Bonetti, L. (2023)
+%    Paper: 
+%    Leading script (s): https://github.com/leonardob92/MEG_STM_OneNote.git
 
 % The folder "LeadingScripts" contains the pipeline of the above referenced study number 1).
 
