@@ -44,9 +44,9 @@
 %    Bonetti, L., Bruzzone, S.E.P., Paunio, T., Kantojarvi, K., Kliuchko, M., Vuust, P., Palva, S., Brattico, E. (2023).
 %    Paper: https://www.sciencedirect.com/science/article/pii/S2405844023028074
 %    Leading script(s): https://github.com/leonardob92/BDNF_MMN_MusicalTraining_Heliyon.git
-% 11)Revealing the spacetime hierarchical whole-brain dynamics of auditory predictive coding. BiorXiv.
+% 11)Spatiotemporal brain hierarchies of auditory memory recognition and predictive coding. BiorXiv.
 %    Bonetti, L., Fernández Rubio, G., Carlomagno, F., Pantazis, D., Vuust, P., Kringelbach, M.L. (2023).
-%    Paper: https://www.biorxiv.org/content/10.1101/2022.11.19.517195v3
+%    Paper: https://www.biorxiv.org/content/10.1101/2022.11.19.517195v4
 %    Leading script (s): https://github.com/leonardob92/HierarchicalPredictiveCoding_Music_MEG.git
 % 12)Challenging age-related decline in brain function: Evidence from fast neuroimaging of musical sequence recognition. BiorXiv.
 %    Bonetti, L., Fernández Rubio, G., Lumaca, M., Carlomagno, F., Risgaard Olsen, E., Criscuolo, A., Kotz, S.A., Vuust, P., Brattico, E., & Kringelbach, M.L. (2023).
