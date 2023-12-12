@@ -54,7 +54,7 @@
 %    Leading script (s): https://github.com/leonardob92/MEG_Aging_Bach.git
 % 13)Neurophysiological correlates of short-term recognition of sounds: Insights from magnetoencephalography. BiorXiv.
 %    Serra, E., Lumaca, M., Brattico, E., Vuust, P., Kringelbach, M. L., Bonetti, L. (2023)
-%    Paper: 
+%    Paper: https://www.biorxiv.org/content/10.1101/2023.12.07.570594v1
 %    Leading script (s): https://github.com/leonardob92/MEG_STM_OneNote.git
 
 % The folder "LeadingScripts" contains the pipeline of the above referenced study number 1).
