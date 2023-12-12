@@ -69,6 +69,10 @@ function [] = waveform_plotting_local_v2(S)
 COL = S.colorline;
 time = S.time_real;
 data = S.data;
+if ~isempty(find(data==0))
+    data(data==0) = nan; %assigning NaN to 0 values to later ignore them when average and standard deviations are computed; of course, you should be aware that if you have 0s that may be a problem.. this is why I inserted the warning
+    warning('your data contains 0s..')
+end
 condition = S.condition_n;
 ROIN = S.ROIs_labels;
 roin = S.ROI_n;
@@ -193,7 +197,7 @@ end
     if isfield(S,'x_lim')
         xlim(S.x_lim)
     end
-    %ylim(ylims)
+    ylim(ylims)
     % if length(condition) == 1
     %     s = [];
     %     for ii = 1:length(condition) %trick to get the title..
@@ -206,131 +210,3 @@ end
     % fontname("Helvetica Neue")
 % end
 end
-
-
-
-
-
-%%
-
-% some notes below..
-% 
-% if isfield(S,'subplot') %if you want subplots you need to provide a field for it
-%     if ~isempty(S.subplot) %and specify numbers
-%         subb = S.subplot;
-%     else %otherwise no subplots
-%         subb = [];
-%     end
-% else %same
-%     subb = [];
-% end
-% if ~isempty(subb)
-%     %creating figure
-%     figure
-%     cnt = 0;
-%     cntr = 0;
-%     for ii = 1:size(data,1) %over ROIs
-%         cntr = cntr + 1;
-%         for cc = 1:length(condition) %over conditions
-%             cnt = cnt + 1;
-%             %mean
-%             ananmean = squeeze(mean(data(ii,:,:,condition(cc)),3,'omitnan'));
-%             %standard error (positive)
-%             stdey = squeeze(std(data(ii,:,:,condition(cc)),0,3,'omitnan')./sqrt(size(data,3)));
-%             subplot(subb(1),subb(2),cntr);
-%             plot(time,ananmean,'Color',COL(cnt,:),'LineWidth',1.5,'DisplayName',[S.conds{condition(cc)} ' ' ROIN{ii}])
-%             hold on
-%             if STE == 1
-%                 plot(time,ananmean + stdey,':','Color',COL(cnt,:),'LineWidth',1,'HandleVisibility','off')
-%                 hold on
-%                 %standard error (negative)
-%                 plot(time,ananmean - stdey,':','Color',COL(cnt,:),'LineWidth',1,'HandleVisibility','off')
-%                 hold on
-%             elseif STE == 2
-%                 fill([time fliplr(time)],[ananmean + stdey fliplr(ananmean - stdey)],COL(cnt,:), 'FaceAlpha', transp,'linestyle','none');
-%                 hold on
-%             end
-%         end
-%     end
-%     %extracting limits of y-axis
-%     if isfield(S,'y_lim')
-%         if ~isempty(S.y_lim)
-%             ylims = S.y_lim;
-%             %         ylim(S.y_lim)
-%         else
-%             ylims = get(gca,'YLim');
-%         end
-%     else
-%         ylims = get(gca,'YLim');
-%     end
-% 
-%     close all
-%     %plotting greay areas to show significant time-points
-%     if ~isempty(sgf1)
-%         cnt = 0;
-%         for rr = 1:size(data,1) %over ROIs
-%             cnt = cnt + 1;
-%             sgf3 = sgf1{rr};
-%             subplot(subb(1),subb(2),cnt);
-%             for iii = 1:length(sgf3) %over significant clusters
-%                 sgf2 = sgf3{iii}; %extracting cluster iii
-%                 if isfield(S,'signtp_col') %if you provide field for different colors for significant time-points
-%                     if ~isempty(S.signtp_col) %if the field is not empty
-%                         patch([sgf2(1) sgf2(end) sgf2(end) sgf2(1)],[ylims(1) ylims(1) ylims(2) ylims(2)],COL(S.signtp_col(iii),:),'EdgeColor','none','FaceAlpha',.1,'HandleVisibility','off')
-%                     else %otherwise assigning classical grey
-%                         patch([sgf2(1) sgf2(end) sgf2(end) sgf2(1)],[ylims(1) ylims(1) ylims(2) ylims(2)],[.85 .85 .85],'EdgeColor','none','FaceAlpha',.5,'HandleVisibility','off')
-%                     end
-%                 else %same
-%                     patch([sgf2(1) sgf2(end) sgf2(end) sgf2(1)],[ylims(1) ylims(1) ylims(2) ylims(2)],[.85 .85 .85],'EdgeColor','none','FaceAlpha',.5,'HandleVisibility','off')
-%                 end
-%                 hold on
-%             end
-%         end
-%     end
-%     %plotting all the waveform again to have them not covered by the grey area.. not the most elegant solution but it is still quick and fine..
-% 
-% 
-% 
-% 
-% cnt = 0;
-%     cntr = 0;
-%     for ii = 1:size(data,1) %over ROIs
-%         cntr = cntr + 1;
-%         for cc = 1:length(condition) %over conditions
-%             cnt = cnt + 1;
-%             %mean
-%             ananmean = squeeze(mean(data(ii,:,:,condition(cc)),3,'omitnan'));
-%             %standard error (positive)
-%             stdey = squeeze(std(data(ii,:,:,condition(cc)),0,3,'omitnan')./sqrt(size(data,3)));
-%             subplot(subb(1),subb(2),cntr);
-%             plot(time,ananmean,'Color',COL(cnt,:),'LineWidth',1.5,'DisplayName',[S.conds{condition(cc)} ' ' ROIN{ii}])
-%             hold on
-%             if STE == 1
-%                 plot(time,ananmean + stdey,':','Color',COL(cnt,:),'LineWidth',1,'HandleVisibility','off')
-%                 hold on
-%                 %standard error (negative)
-%                 plot(time,ananmean - stdey,':','Color',COL(cnt,:),'LineWidth',1,'HandleVisibility','off')
-%                 hold on
-%             elseif STE == 2
-%                 fill([time fliplr(time)],[ananmean + stdey fliplr(ananmean - stdey)],COL(cnt,:), 'FaceAlpha', transp,'linestyle','none');
-%                 hold on
-%             end
-%         end
-%     end
-%     grid minor
-%     box on
-%     if S.legendl == 1
-%         legend('show')
-%     end
-%     if isfield(S,'x_lim')
-%         xlim(S.x_lim)
-%     end
-%     ylim(ylims)
-%     % if length(condition) == 1
-%     %     s = [];
-%     %     for ii = 1:length(condition) %trick to get the title..
-%     %         s = strcat(s,S.conds{condition(ii)});
-%     %     end
-%     %     title(s)
-%     % end
-%     set(gcf,'color','w')
