@@ -29,10 +29,10 @@ addpath('/projects/MINDLAB2017_MEG-LearningBach/scripts/MITDecodingToServer/Brai
 %extracting information
 ROI_n = S.ROI_n;
 f = S.f;
-load(S.mask);
+maskk = S.mask;
 list = S.subjlist;
 time = S.time;
-dop = length(find(ROIs_DCM(:,ROI_n)==1)); %ROIs_DCM is loaded through S.mask, this should be improved or it will create troubles sooner or later..
+dop = length(find(maskk(:,ROI_n)==1));
 ii = S.ii;
 %actual computation
 disp(['loading data for subject ' num2str(ii)])
@@ -40,11 +40,20 @@ load([list(ii).folder '/' list(ii).name]);
 Psubj = zeros(length(f),length(time),length(OUT.sources_ERFs)); %frequencies x time-points x conditions
 for cc = 1:length(OUT.sources_ERFs) %over conditions
     dum = OUT.sources_ERFs{cc}; %getting single trial data for Old correct
-    data = dum(ROIs_DCM(:,ROI_n)==1,:,:); %getting single voxels for VMPFC
+    data = dum(maskk(:,ROI_n)==1,:,:); %getting single voxels for VMPFC
     P2 = zeros(length(f),length(time),size(dum,3));
     for xx = 1:size(dum,3) %over trials
         Pdum = zeros(dop,length(f),length(time));
-        Pdum(:,:,:) = morlet_transform(data(:,:,xx),time,f); %frequency decomposition (for each voxel of ROI and each trial independently)
+        if isfield(S,'baselcorr') %if baseline correction
+            if ~isempty(S.baselcorr)
+                dumbo = morlet_transform(data(:,:,xx),time,f); %frequency decomposition (for each voxel of ROI and each trial independently)
+                Pdum(:,:,:) = dumbo - mean(dumbo(:,:,S.baselcorr(1):S.baselcorr(2)),3); %removing the indicating baseline
+            else
+                Pdum(:,:,:) = morlet_transform(data(:,:,xx),time,f); %frequency decomposition (for each voxel of ROI and each trial independently)
+            end
+        else
+            Pdum(:,:,:) = morlet_transform(data(:,:,xx),time,f); %frequency decomposition (for each voxel of ROI and each trial independently)
+        end
         Pdum = permute(Pdum,[2 3 1]); %permuting order so to have voxels in the 3th dimension
         P2(:,:,xx) = mean(Pdum,3); %average over voxels
         disp(['subject ' num2str(ii) ' - trial ' num2str(xx)])

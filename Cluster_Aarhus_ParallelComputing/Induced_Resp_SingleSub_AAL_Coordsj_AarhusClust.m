@@ -47,13 +47,30 @@ for jj = 1:length(conds) %over conditions
         P = zeros(length(idx),length(f),ttt,size(dum,3));
         for xx = 1:size(dum,3) %over trials
             data = dum(idx,:,xx);
-            P(:,:,:,xx) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+            if isfield(S,'baselcorr') %if baseline correction
+                if ~isempty(S.baselcorr)
+                    dumbo = morlet_transform(data,time(1:size(data,2)),f); %computing power
+                    P(:,:,:,xx) = dumbo - mean(dumbo(:,:,S.baselcorr(1):S.baselcorr(2)),3); %removing the indicated baseline
+                else
+                    P(:,:,:,xx) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+                end
+            else
+                P(:,:,:,xx) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+            end
         end
         Psubj(:,:,:,jj) = mean(P,4); %average over trials
-        
     else
         data = OUT.sources_ERFs(idx,:,conds(jj));
-        Psubj(:,:,:,jj) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+        if isfield(S,'baselcorr') %if baseline correction
+            if ~isempty(S.baselcorr)
+                dumbo = morlet_transform(data,time(1:size(data,2)),f);
+                Psubj(:,:,:,jj) = dumbo - mean(dumbo(:,:,S.baselcorr(1):S.baselcorr(2)),3);
+            else
+                Psubj(:,:,:,jj) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+            end
+        else
+            Psubj(:,:,:,jj) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+        end
     end
 end
 time = time(1:ttt);
