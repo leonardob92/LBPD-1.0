@@ -16,7 +16,7 @@
 %% TO-DO:
 % Patch can create colour gradients using the 'interp' option to 'FaceColor'. Allow this?
 
-function h = rm_raincloud2(data, colours, plot_top_to_bottom, density_type, bandwidth)
+function h = rm_raincloud2(data, colours, sbarb, plot_top_to_bottom, density_type, bandwidth)
 %% check dimensions of data
 
 
@@ -30,15 +30,15 @@ cb = [0.5 0.8 0.9; 1 1 0.7; 0.7 0.8 0.9; 0.8 0.5 0.4; 0.5 0.7 0.8; 1 0.8 0.5; 0.
 
 %% default arguments
 
-if nargin < 3
+if nargin < 4
     plot_top_to_bottom  = 0;    % left-to-right plotting by default
 end
 
-if nargin < 4
+if nargin < 5
     density_type        = 'ks'; % use 'ksdensity' to create cloud shapes
 end
 
-if nargin < 5
+if nargin < 6
     bandwidth           = [];   % let the function specify the bandwidth
 end
 
@@ -174,7 +174,13 @@ end
 % raincloud at the top. So flip the vector around
 set(gca, 'YTick', fliplr(ks_offsets));
 
-set(gca, 'YTickLabel', n_plots_per_series:-1:1);
+if ~exist('sbarb','var')
+    set(gca, 'YTickLabel', n_plots_per_series:-1:1); %original
+else
+    %labels
+    yticklabels(sbarb) %leonardo
+end
+
 
 %% determine plot rotation
 % default option is left-to-right
