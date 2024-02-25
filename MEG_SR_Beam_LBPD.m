@@ -141,15 +141,42 @@ if ~isempty(S.norm_megsensors.freq) %if you have provided a frequency range
         error('if you want to apply the bandpass filter you need to provide continuous data (in S.norm_megsensors.MEGdata_c)')
     end   
     disp('filtering MEG sensor data')
+    
+   %%% original (for some reasons, in some cases the bandpass filter did not work and I had to use a low pass filter which in this particular case was also fine  
     S3 = [];
     S3.D = S.norm_megsensors.MEGdata_c; %continuous data
     S3.freq = S.norm_megsensors.freq; %frequency range
     S3.band = 'bandpass';
 %     S.prefix = 'f_LBPD';
     D = spm_eeg_filter(S3); %actual function
+   %%%
+
+   %%% temporary 
+%     S3 = [];
+%     S3.D = S.norm_megsensors.MEGdata_c; %continuous data
+%     S3.freq = [3.5]; %frequency range
+%     S3.band = 'low';
+% %     S.prefix = 'f_LBPD';
+%     D = spm_eeg_filter(S3); %actual function
+   %%%
+    
+    
     disp('epoching MEG filtered sensor data with epochinfo from your previously epoched data')
     D_e = spm_eeg_load(S.norm_megsensors.MEGdata_e); %loading previously computed epoched data to get epochinfo (info about trials specification, labels, etc.)
     epochinfo = D_e.epochinfo; %getting the epochinfo information
+    
+    %%% TEMPORARY!! for communications biology..
+    %1000ms
+%     epochinfo.trl(:,1) = epochinfo.trl(:,1) - 135;
+%     epochinfo.trl(:,3) = ones(length(epochinfo.trl),1).*(-150);
+    %500ms
+%     epochinfo.trl(:,1) = epochinfo.trl(:,1) - 60;
+%     epochinfo.trl(:,3) = ones(length(epochinfo.trl),1).*(-75);
+    %2000ms
+%     epochinfo.trl(:,1) = epochinfo.trl(:,1) - 285;
+%     epochinfo.trl(:,3) = ones(length(epochinfo.trl),1).*(-300);
+    %%%
+    
     %building structure for spm_eeg_epochs
     S3 = [];
     S3.D = D; %filtered continuous data

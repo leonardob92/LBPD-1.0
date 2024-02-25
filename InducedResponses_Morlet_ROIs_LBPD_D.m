@@ -22,6 +22,8 @@ O = [];
 %           -S.subjlist:        list of subjects (output of LBPD source reconstruction)
 %           -S.time:            vector of time in seconds (it assumes the source reconstructed data has the same time.
 %                               If time is not the same, it takes from time-sample 1 up till the end of S.time).
+%           -S.baselcorr:         time-points for baseline correction (e.g. [1 25].
+%                                 Leave empty [] or do not provide field for not computing baseline correction.
 %           -S.Aarhus_clust:    0 = working locally
 %                                   integer number (i.e. 1) = sending one job for each subject to the Aarhus cluster (the number you insert
 %                                   here corresponds to the slots of memory that you allocate for each job.
@@ -96,7 +98,16 @@ for ii = 1:length(list)
                 %             end
                 %other solution
                 Pdum = zeros(dop,length(f),length(time));
-                Pdum(:,:,:) = morlet_transform(data(:,:,xx),time,f); %frequency decomposition (for each voxel of ROI and each trial independently)
+                if isfield(S,'baselcorr') %if baseline correction
+                    if ~isempty(S.baselcorr)
+                        dumbo = morlet_transform(data(:,:,xx),time,f); %frequency decomposition (for each voxel of ROI and each trial independently)
+                        Pdum(:,:,:) = dumbo - mean(dumbo(:,:,S.baselcorr(1):S.baselcorr(2)),3); %removing the indicating baseline
+                    else
+                        Pdum(:,:,:) = morlet_transform(data(:,:,xx),time,f); %frequency decomposition (for each voxel of ROI and each trial independently)
+                    end
+                else
+                    Pdum(:,:,:) = morlet_transform(data(:,:,xx),time,f); %frequency decomposition (for each voxel of ROI and each trial independently)
+                end
                 Pdum = permute(Pdum,[2 3 1]); %permuting order so to have voxels in the 3th dimension
                 P2(:,:,xx) = mean(Pdum,3); %average over voxels
                 disp(['subject ' num2str(ii) ' - trial ' num2str(xx)])

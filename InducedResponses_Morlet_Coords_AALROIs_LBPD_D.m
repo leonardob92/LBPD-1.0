@@ -21,10 +21,13 @@ O = [];
 %           -S.conds:             indices of experimental conditions to be used (in connection to LBPD source reconstruction
 %           -S.coordd:            vector (n of voxels x 3 (x,y,z in MNI space)) with coordinates to be used.
 %                                 Leave empty [] if you want to use a full ALL ROI(s).
+%           -S.AAL_ROIs:          vector with indices of AAL ROIs that you want to use for the computation of the TF analysis 
 %           -S.Aarhus_clust:      0 = working locally
 %                                 integer number (i.e. 1) = sending one job for each subject to the Aarhus cluster (the number you insert
 %                                 here corresponds to the slots of memory that you allocate for each job.
 %           -S.subjlist:          list of subjects (output of LBPD source reconstruction) provided as the output of the "dir" Matlab function
+%           -S.baselcorr:         time-points for baseline correction (e.g. [1 25].
+%                                 Leave empty [] or do not provide field for not computing baseline correction. 
 %           -S.time:              vector of time in seconds (it assumes the source reconstructed data has the same time.
 %           -S.outdir:            path and name (without ".mat") to store the results
 
@@ -150,13 +153,30 @@ for ii = 1:length(list)
                 P = zeros(length(idx),length(f),ttt,size(dum,3));
                 for xx = 1:size(dum,3) %over trials
                     data = dum(idx,:,xx);
-                    P(:,:,:,xx) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+                    if isfield(S,'baselcorr') %if baseline correction
+                        if ~isempty(S.baselcorr)
+                            dumbo = morlet_transform(data,time(1:size(data,2)),f); %computing power
+                            P(:,:,:,xx) = dumbo - mean(dumbo(:,:,S.baselcorr(1):S.baselcorr(2)),3); %removing the indicated baseline
+                        else
+                            P(:,:,:,xx) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+                        end
+                    else
+                        P(:,:,:,xx) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+                    end
                 end
                 P2(:,:,:,jj,ii) = mean(P,4); %average over trials
-                
             else
                 data = OUT.sources_ERFs(idx,:,conds(jj));
-                P2(:,:,:,jj,ii) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+                if isfield(S,'baselcorr') %if baseline correction
+                    if ~isempty(S.baselcorr)
+                        dumbo = morlet_transform(data,time(1:size(data,2)),f);
+                        P2(:,:,:,jj,ii) = dumbo - mean(dumbo(:,:,S.baselcorr(1):S.baselcorr(2)),3);
+                    else
+                        P2(:,:,:,jj,ii) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+                    end
+                else
+                    P2(:,:,:,jj,ii) = morlet_transform(data,time(1:size(data,2)),f); %frequency decomposition
+                end
             end
         end
         clear OUT dum P

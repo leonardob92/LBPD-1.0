@@ -309,7 +309,11 @@ if S.waveform_singlechannels_label == 1
         x_lim_temp = [time_sel(1) time_sel(end)];
     end
     data_mean = squeeze(nanmean(data_mat,3)); %averaging data over participants
-    data_stde = squeeze(nanstd(data_mat,0,3))/sqrt(Sz(3)); %calcolating standard error
+    if length(Sz) == 2
+        data_stde = squeeze(nanstd(data_mat,0,3))/1; %calcolating standard error
+    else
+        data_stde = squeeze(nanstd(data_mat,0,3))/sqrt(Sz(3)); %calcolating standard error
+    end
     if S.wave_plot_conditions_together == 1 %if you want to average/select some conditions
         if ~isempty(S.ave_cond) %if you provide which ones
             mdum = zeros(size(data_mean,1),size(data_mean,2),length(S.ave_cond)); %preallocating space
