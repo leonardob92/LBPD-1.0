@@ -192,6 +192,8 @@
 % 47)Extract_MEGSensor_Information_LBPD_D
 % 48)waveplot_groups_server_LBPD (waveplot_groups_local for local computers and not Aarhus server)
 % 49)waveform_plotting_local (waveplot_local for local computers and not Aarhus server)
+% 50)create_HCP_MMP1_nifti_LBPD
+% 51)PCA_LBPD
 
 % Additional scripts:
 % - Workbench_Codes_LocalMac_Example
