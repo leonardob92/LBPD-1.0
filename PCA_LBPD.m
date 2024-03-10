@@ -209,16 +209,23 @@ OUT.PCA_timeseries = J; %storing PCA time series
 %plotting eigenvectors in the brain
 if S.fig_l == 1
     %plotting weights in the brain (nifti images)
-    maskk = load_nii('/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External/MNI152_T1_8mm_brain.nii.gz');
+    maskk = load_nii('/projects/MINDLAB2017_MEG-LearningBach/scripts/Leonardo_FunctionsPhD/External/MNI152_8mm_brain_diy.nii.gz'); %getting the mask for creating the figure
     for ii = 1:PCs(end) %over significant PCs
         %using nifti toolbox
-        dumimg = maskk.img; %getting the image matrix
-        dumimg(find(maskk.img ~= 0)) = VV2(:,ii); %assigning values of the new variable to the non-0 indices of the image matrix
+        SO = wcoeff(:,ii);
+        %building nifti image
+        SS = size(maskk.img);
+        dumimg = zeros(SS(1),SS(2),SS(3),1); %no time here so size of 4D = 1
+        for jj = 1:size(SO,1) %over brain sources
+            dumm = find(maskk.img == jj); %finding index of sources ii in mask image (MNI152_8mm_brain_diy.nii.gz)
+            [i1,i2,i3] = ind2sub([SS(1),SS(2),SS(3)],dumm); %getting subscript in 3D from index
+            dumimg(i1,i2,i3,:) = SO(jj,:); %storing values for all time-points in the image matrix
+        end
         nii = make_nii(dumimg,[8 8 8]); %making nifti image from 3D data matrix (and specifying the 8 mm of resolution)
         nii.img = dumimg; %storing matrix within image structure
         nii.hdr.hist = maskk.hdr.hist; %copying some information from maskk
-        disp('saving nifti image')
-        save_nii(nii,[S.namenii 'PC_' num2str(ii) '.nii']); %printing image
+        disp(['saving nifti image - component ' num2str(ii)])
+        save_nii(nii,[S.namenii 'PC_' num2str(ii) '_Var_' num2str(round(vare(ii))) '.nii']); %printing image
     end
     %plotting time series of the significant PCA components
     if S.onefig == 1
