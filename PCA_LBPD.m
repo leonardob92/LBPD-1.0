@@ -14,13 +14,13 @@ function [ OUT ] = PCA_LBPD( S )
 %         -S structure with fields:
 %           -H:             data matrix (i.e. brain sources x time-points) (optionally it can be brain sources x time-points x experimental conditions).
 %                           If a third dimension is provided  (e.g. for experimental conditions)
-%                           it will be used NOT for PCA computation but only for plotting.
-%                           PCA will always be computed on the first value of the third dimension (if any).
+%                           PCA will be done on the data after average over the third dimension.
 %           -rand_l:        strategy for randomisation:
 %                           1 = randomising only time-points (independently for each time series)
 %                           2 = randomising only space (independently for each time-point) 
 %                           3 = randomising both time and space
-%           -permnum:       number of permutations for Monte-Carlo simulations (e.g. 100 or 1000)
+%           -permnum:       number of permutations for Monte-Carlo simulations (e.g. 100 or 1000).
+%                           If negative values, you take a fixed number of components (e.g. -3 = getting the first 3 components and not computing the MCS).  
 %           -fig_l:         1 for plotting some figures illustrating the results; 0 otherwise
 %           -sign_eig:      method for normalizing eigenvectors sign (SUGGESTED EITHER 'max_abs' or 'average'):
 %                            -'occurrences' = using mean of the negative/positive values occurrences
@@ -94,37 +94,39 @@ permnum = S.permnum;
 rand_l = S.rand_l;
 
 %actual PCA computation
-H = S.H(:,:,1);
+H = mean(S.H(:,:,:),3);
 [wcoeff,~,~,~,vare] = pca(H');
 
 % PCA on randomised data
-mfD = zeros(permnum,1);
-for pp = 1:permnum %over permutations
-    if rand_l == 1     %randomizing only time
-        r_resh = zeros(size(H,1),size(H,2));
-        for ss = 1:size(H,1) %over brain sources
-            idx_dummy = randperm(size(H,2)); %create a permuted array of the indices of the temporal dimension
-            r_resh(ss,:) = H(ss,idx_dummy);
+if permnum > 0
+    mfD = zeros(permnum,1);
+    for pp = 1:permnum %over permutations
+        if rand_l == 1     %randomizing only time
+            r_resh = zeros(size(H,1),size(H,2));
+            for ss = 1:size(H,1) %over brain sources
+                idx_dummy = randperm(size(H,2)); %create a permuted array of the indices of the temporal dimension
+                r_resh(ss,:) = H(ss,idx_dummy);
+            end
+        elseif rand_l == 2 %randomizing only space
+            r_resh = zeros(size(H,1),size(H,2));
+            for ss = 1:size(H,2) %over time-points
+                idx_dummy = randperm(size(H,1)); %create a permuted array of the indices of the spatial dimension
+                r_resh(:,ss) = H(idx_dummy,ss);
+            end
+        elseif rand_l == 3 %randomizing both space and time
+            %randomizing data..
+            idx_dummy = randperm(size(H,1)*size(H,2)); %create a permuted array from 1 to size of original data vector
+            r_dummy = zeros(size(H,1)*size(H,2),1); %initialise new vector
+            r_dummy(1:size(H,1)*size(H,2)) = H(idx_dummy); %taking element in matrix data with index idx_dummy
+            r_resh = reshape(r_dummy,[size(H,1),size(H,2)]); %reshaping the vector into a matrix shaped as the original data
+            %running PCA in single steps on randomised data
         end
-    elseif rand_l == 2 %randomizing only space
-        r_resh = zeros(size(H,1),size(H,2));
-        for ss = 1:size(H,2) %over time-points
-            idx_dummy = randperm(size(H,1)); %create a permuted array of the indices of the spatial dimension
-            r_resh(:,ss) = H(idx_dummy,ss);
-        end
-    elseif rand_l == 3 %randomizing both space and time
-        %randomizing data..
-        idx_dummy = randperm(size(H,1)*size(H,2)); %create a permuted array from 1 to size of original data vector
-        r_dummy = zeros(size(H,1)*size(H,2),1); %initialise new vector
-        r_dummy(1:size(H,1)*size(H,2)) = H(idx_dummy); %taking element in matrix data with index idx_dummy
-        r_resh = reshape(r_dummy,[size(H,1),size(H,2)]); %reshaping the vector into a matrix shaped as the original data
-        %running PCA in single steps on randomised data
+        [~,~,~,~,varef] = pca(r_resh');
+        mfD(pp,1) = max(max(varef)); %storing maximum variance (max eigenvalue) occurring for PCs in randomized data
+        disp(pp)
     end
-    [~,~,~,~,varef] = pca(r_resh');
-    mfD(pp,1) = max(max(varef)); %storing maximum variance (max eigenvalue) occurring for PCs in randomized data
-    disp(pp)
+    MFD = max(mfD); %absolute maximum variance
 end
-MFD = max(mfD); %absolute maximum variance
 
 %ALTERNATIVE - MANUAL SOLUTION
 % mfD = zeros(permnum,1);
@@ -150,8 +152,10 @@ MFD = max(mfD); %absolute maximum variance
 if S.fig_l == 1
     figure
     plot(vare(1:100),'DisplayName','data')
-    hold on
-    plot(varef(1:100),'DisplayName','rand')
+    if permnum > 0
+        hold on
+        plot(varef(1:100),'DisplayName','rand')
+    end
     grid minor
     legend('show')
     set(gcf,'color','w')
@@ -169,15 +173,22 @@ if S.fig_l == 1
     end
 end
 
-PCs = find(vare>MFD); %significant PCs obtained by getting PCs with variance (eigenvalues) higher than the maximum variance (eigenvalues) obtained from randomized data
+if permnum > 0
+    PCs = find(vare>MFD); %significant PCs obtained by getting PCs with variance (eigenvalues) higher than the maximum variance (eigenvalues) obtained from randomized data
+else
+    PCs = 1:(permnum*(-1));
+end
 disp('percentage of variance explained by significant PCs')
-disp('real data (left colum) - randomised data (right column)')
 disp(vare(PCs))
 
 %output structure
 OUT = [];
 OUT.variance_PCS = vare; %storing variance of significant PCs
-OUT.sign_comps_idx = PCs;
+if permnum > 0
+    OUT.sign_comps_idx = PCs;
+else
+    OUT.sign_comps_idx = 'MCS has not been run';
+end
 
 %normalizing eigenvectors signs
 dumones = ones(size(wcoeff,1),size(wcoeff,2)); %vector of 1s with lenngth of significant PCs
@@ -230,24 +241,24 @@ if S.fig_l == 1
     %plotting time series of the significant PCA components
     if S.onefig == 1
         figure
-        for pp = 1:size(S.H,3) %over significant PCA components
+        for pp = 1:length(PCs) %over significant PCA components
             for ii = 1:size(S.H,3) %over experimental conditions
                 plot(time(1:size(wcoeff,2)),J(:,pp,ii),'LineWidth',2,'DisplayName',['Cond ' num2str(ii) ' PCA ' num2str(pp) ' Var ' num2str(vare(pp))])
                 hold on
             end
         end
-        xlim([-0.1 3.4])
+        xlim([time(1) time(end)])
         set(gcf,'color','w')
         legend('show')
         grid minor
     else
-        for pp = 1:size(S.H,3) %over significant PCA components
+        for pp = 1:length(PCs) %over significant PCA components
             figure
             for ii = 1:size(S.H,3) %over experimental conditions
                 plot(time(1:size(wcoeff,2)),J(:,pp,ii),'LineWidth',2,'DisplayName',['Cond ' num2str(ii) ' PCA ' num2str(pp) ' Var ' num2str(vare(pp))])
                 hold on
             end
-            xlim([-0.1 3.4])
+            xlim([time(1) time(end)])
             set(gcf,'color','w')
             legend('show')
             grid minor
