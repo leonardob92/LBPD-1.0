@@ -50,7 +50,7 @@ function [ OUT ] = MEG_SR_Beam_LBPD( S )
 %                                           0 to use original data in the inversion if you have only mag or grad (while e.g. you may have used zscored-data for covariance'matrix)
 %                                           (SUGGESTED 0 IN BOTH CASES!)
 %                                           (PLEASE, NOTE THAT THE COVARIANCE MATRIX IS ALWAYS CALCULATED BEFORE WITH THE OPTION PROVIDED WITH: "S.norm_megsensors.zscorel_cov")
-%            S.inversion.timef:             data-points to be extracted (e.g. 1:300); leave it empty [] for working on the full length of the epoch
+%            S.inversion.timef:             data-points to be extracted (e.g. 1:300); leave it empty [] for working on the full length of the epoch (both for covariance matrix and for ERF data to be multiplied by weights W)
 %            S.inversion.conditions:        cell with characters for the labels of the experimental conditions (e.g. {'Old_Correct','New_Correct'})
 %            S.inversion.bc:                specify the time-samples to be used for baseline correction (as usual, subtraction of the mean of the baseline from the whole timeseries; independently done for each brain source).
 %                                           e.g. [1 15] means first 15 time-samples (e.g. 100ms if you have sampling rate = 150Hz).
@@ -66,9 +66,12 @@ function [ OUT ] = MEG_SR_Beam_LBPD( S )
 %                                            3 = mean divided by square root of standard deviation
 %                                            4 = mean divided by (standard deviation divided by square root of number of trials) (actual t-value..)
 %                                            5 = single trials (i.e. all trials independently)
+%                                            6 = custom data (matrix: MEG channels x time-points x (new) conditions); OBS!! This requires "S.inversion.alternative_data" 
 %                                           -Contrasts between two experimental conditions:
 %                                            1 = simple difference of means over trials
 %                                            2-3-4 = two-sample t-tests,
+%           S.inversion.alternative_data:   cell array: {1} = new data (double matrix: MEG channels x time-points x (new) conditions)
+%                                                       {2} = new conditions label (cell array with characters) 
 
 %           -S.smoothing (IV)
 %            S.smoothing.spatsmootl:        1 for spatial smoothing; 0 otherwise
@@ -583,24 +586,34 @@ end
 %I did not delete these lines since it may useful to read this information in the future
 % if meanll == 1 %mean over trials and then source reconstruction
 %computing mean of ERFs (consider to compute also median later..)
-ERFs = cell(1,length(conditions));
-for ii = 1:length(conditions) %over experimental conditions
-    if ~isempty(conds{ii}) %it mis empty if there are is no match between condition requested by user and condition in MEG data (it may happen for a few subjects..)
-        if S.inversion.effects == 1 %simple mean over trials
-            ERFs{ii} = mean(datameg(:,:,conds{ii}),3);
-        elseif S.inversion.effects == 2 %mean divided by st
-            ERFs{ii} = mean(datameg(:,:,conds{ii}),3) ./ std(datameg(:,:,conds{ii}),0,3);
-        elseif S.inversion.effects == 3 %mean divided by square root of st
-            ERFs{ii} = mean(datameg(:,:,conds{ii}),3) ./ sqrt(std(datameg(:,:,conds{ii}),0,3)); %(variation of t-value, dividing mean over trials by their standard error
-        elseif S.inversion.effects == 4 %mean divided by (st divided by square root of number of trials) (actual t-value..)
-            ERFs{ii} = mean(datameg(:,:,conds{ii}),3) ./ (std(datameg(:,:,conds{ii}),0,3)./sqrt(length(conds{ii}))); %t-value (sort of), dividing mean over trials by their standard error
-        elseif S.inversion.effects == 5 %all trials
-            ERFs{ii} = datameg(:,:,conds{ii});
+if S.inversion.effects == 6 %custom data provided by the user
+    ERFs = cell(1,size(S.inversion.alternative_data,3));
+    for ii = 1:size(S.inversion.alternative_data{1},3) %over 3rd dimension of the custom data (which is supposed to be the new "condition")
+        dumdim = S.inversion.alternative_data{1}; %extracting the data
+        ERFs{ii} = dumdim(:,:,ii); %placing the data in the required format
+        conditions = S.inversion.alternative_data{2}; %extrating the new conditions label
+    end
+else
+    ERFs = cell(1,length(conditions));
+    for ii = 1:length(conditions) %over experimental conditions
+        if ~isempty(conds{ii}) %it mis empty if there are is no match between condition requested by user and condition in MEG data (it may happen for a few subjects..)
+            if S.inversion.effects == 1 %simple mean over trials
+                ERFs{ii} = mean(datameg(:,:,conds{ii}),3);
+            elseif S.inversion.effects == 2 %mean divided by st
+                ERFs{ii} = mean(datameg(:,:,conds{ii}),3) ./ std(datameg(:,:,conds{ii}),0,3);
+            elseif S.inversion.effects == 3 %mean divided by square root of st
+                ERFs{ii} = mean(datameg(:,:,conds{ii}),3) ./ sqrt(std(datameg(:,:,conds{ii}),0,3)); %(variation of t-value, dividing mean over trials by their standard error
+            elseif S.inversion.effects == 4 %mean divided by (st divided by square root of number of trials) (actual t-value..)
+                ERFs{ii} = mean(datameg(:,:,conds{ii}),3) ./ (std(datameg(:,:,conds{ii}),0,3)./sqrt(length(conds{ii}))); %t-value (sort of), dividing mean over trials by their standard error
+            elseif S.inversion.effects == 5 %all trials
+                ERFs{ii} = datameg(:,:,conds{ii});
+            end
         end
     end
 end
 %this should be ok, but a further check could be suggested..
-if S.beamfilters.sensl == 3 && S.inversion.znorml ~= 1 %if you have both MEG sensors and they should be normalized with reference to their overall maximum value
+if S.beamfilters.sensl == 3 && S.inversion.znorml ~= 1 && S.inversion.effects ~= 6 %custom data provided by the user
+  %if you have both MEG sensors and they should be normalized with reference to their overall maximum value
     %getting maximum and minimum values experimental conditions together
     maxx = zeros(length(conditions),1);
     minn = zeros(length(conditions),1);
@@ -650,7 +663,7 @@ end
 
 
 disp('computing inversion')
-if S.inversion.effects < 5
+if S.inversion.effects ~= 5 %aggregated trials (e.g. averaged)
     sources_ERFs = zeros(length(W),length(time),length(conditions));
     for cc = 1:length(conditions) %over conditions
         if ~isempty(ERFs{cc}) %if there was no condition cc in MEG data
@@ -658,6 +671,7 @@ if S.inversion.effects < 5
                 for tt = 1:length(time) %over time-points
                     sources_ERFs(ii,tt,cc) = W{ii} * ERFs{cc}(:,tt); %actual inversion
                 end
+                disp(ii)
             end
         end
     end
@@ -868,8 +882,9 @@ end
 
 %saving output on disk
 disp('saving results')
+%for the future better saving assuming the all files are big
 if S.inversion.effects < 5 %normally small(ish) file
-    save([S.norm_megsensors.workdir '/' S.out_name '_norm' num2str(S.inversion.znorml) '_abs_' num2str(S.inversion.abs) '.mat'],'OUT')
+    save([S.norm_megsensors.workdir '/' S.out_name '_norm' num2str(S.inversion.znorml) '_abs_' num2str(S.inversion.abs) '.mat'],'OUT','-v7.3')
 else %single trial data can be way bigger..
     save([S.norm_megsensors.workdir '/' S.out_name '_norm' num2str(S.inversion.znorml) '_abs_' num2str(S.inversion.abs) '.mat'],'OUT','-v7.3')
 end
