@@ -24,14 +24,16 @@ O = [];
 %                                       second number is either 1 or 2, depending on the orientation of the line (upper or lower part of the plot). 
 %                                       For this option, you need to provide the color codes in S.signtp_col.
 %                                       Leave empty [] for plotting shaded colors instead. 
-%                    -S.signtp_col:     vector with indices corresponding to the color code for each significant time-windows.
-%                                       The color code are the ones provided in S.colorline (!). 
+%                    -S.signtp_col:     vector with indices corresponding to the color code/marker for each significant time-windows.
+%                                       The color code are the ones provided in S.colorsign (!). 
 %                                       Do not provide or leave empty [] for assigning automatically grey color.
 %                                       Unssupported for subplots.
 %                    -S.legendl:        set 1 for having the legend; 0 otherwise
 %                    -S.x_lim:          Set temporal (x) limits in s
 %                    -S.y_lim:          Set amplitudel (y) limits in fT
 %                    -S.colorline:      Select colorline for each group (provide 3-element array RGB color code)
+%                    -S.colorsign:      Colors or markers for the lines showing the significant clusters (not to be confounded with the colors of the waveforms, provided in S.colorline)
+%                                       Markers should be provided in a cell array e.g. S.colorsign = {'*';'+'}; Colors in double, e.g. S.colorsign = [0.9 0.1 1; 1 0 0.1]
 %                    -S.time_real:      time in seconds
 %                    -S.conds:          cell array with condition names (for title)
 %                    -S.STE:            1 = dot lines for standard errors
@@ -73,6 +75,7 @@ O = [];
 
 %extracting data
 COL = S.colorline;
+% COL2 = S.colorsign;
 time = S.time_real;
 data = S.data;
 if ~isempty(find(data==0))
@@ -139,7 +142,7 @@ for cc = 1:length(condition) %over conditions
                 plot(time,ananmean - stdey,':','Color',COL(cnt,:),'LineWidth',1,'HandleVisibility','off')
                 hold on
             elseif STE == 2
-                fill([time fliplr(time)],[ananmean + stdey fliplr(ananmean - stdey)],COL(cnt,:), 'FaceAlpha', transp,'linestyle','none');
+                fill([time fliplr(time)],[ananmean + stdey fliplr(ananmean - stdey)],COL(cnt,:), 'FaceAlpha', transp,'linestyle','none','HandleVisibility','off');
                 hold on
             end
         end
@@ -166,13 +169,25 @@ if ~isempty(sgf1)
         if isfield(S,'signtp_col') %if you provide field for different colors for significant time-points
             if ~isempty(S.signtp_col) %if the field is not empty
                 if isempty(linep) %if you do not want the significant time-windows plotted as lines
-                    patch([sgf2(1) sgf2(end) sgf2(end) sgf2(1)],[ylims(1) ylims(1) ylims(2) ylims(2)],COL(S.signtp_col(iii),:),'EdgeColor','none','FaceAlpha',.1,'HandleVisibility','off') %you get them with shaded colors
+                    if ~iscell(S.colorsign) %if you provide colors
+                        patch([sgf2(1) sgf2(end) sgf2(end) sgf2(1)],[ylims(1) ylims(1) ylims(2) ylims(2)],S.colorsign(S.signtp_col(iii),:),'EdgeColor','none','FaceAlpha',.1,'HandleVisibility','off') %you get them with shaded colors
+                    else %otherwise patch color
+                        patch([sgf2(1) sgf2(end) sgf2(end) sgf2(1)],[ylims(1) ylims(1) ylims(2) ylims(2)],[.85 .85 .85],'EdgeColor','none','FaceAlpha',.1,'HandleVisibility','off') %you get them with shaded colors
+                    end
                 else
                     for ff = round(find(sgf2(1)==time)):round(find(sgf2(2)==time))
                         if min(ananmean) < 0 %if the minimum is negative, I subtract which reduces the space occupied by the lines in the plot)
-                            plot([sgf2(1),sgf2(end)],[ylims(linep(2)) - (ylims(linep(2)))/linep(1)*S.signtp_col(iii),ylims(linep(2)) - (ylims(linep(2)))/linep(1)*S.signtp_col(iii)],'color',COL(S.signtp_col(iii),:),'LineStyle','-','HandleVisibility','off','LineWidth',1.5)
+                            if ~iscell(S.colorsign) %if you provide colors
+                                plot([sgf2(1),sgf2(end)],[ylims(linep(2)) - (ylims(linep(2)))/linep(1)*S.signtp_col(iii),ylims(linep(2)) - (ylims(linep(2)))/linep(1)*S.signtp_col(iii)],'color',S.colorsign(S.signtp_col(iii),:),'LineStyle','-','HandleVisibility','off','LineWidth',1.5)
+                            else %you provide markers
+                                plot([sgf2(1),sgf2(end)],[ylims(linep(2)) - (ylims(linep(2)))/linep(1)*S.signtp_col(iii),ylims(linep(2)) - (ylims(linep(2)))/linep(1)*S.signtp_col(iii)],'color','k','LineStyle','-','Marker',S.colorsign{S.signtp_col(iii)},'MarkerSize',5,'HandleVisibility','off','LineWidth',1.5)
+                            end
                         else %otherwise, for obtaining the same results, I have to add
-                            plot([sgf2(1),sgf2(end)],[ylims(linep(2)) + (ylims(linep(2)))/linep(1)*S.signtp_col(iii),ylims(linep(2)) + (ylims(linep(2)))/linep(1)*S.signtp_col(iii)],'color',COL(S.signtp_col(iii),:),'LineStyle','-','HandleVisibility','off','LineWidth',1.5)
+                            if ~iscell(S.colorsign) %if you provide colors
+                                plot([sgf2(1),sgf2(end)],[ylims(linep(2)) + (ylims(linep(2)))/linep(1)*S.signtp_col(iii),ylims(linep(2)) + (ylims(linep(2)))/linep(1)*S.signtp_col(iii)],'color',S.colorsign(S.signtp_col(iii),:),'LineStyle','-','HandleVisibility','off','LineWidth',1.5)
+                            else %you provide markers
+                                plot([sgf2(1),sgf2(end)],[ylims(linep(2)) + (ylims(linep(2)))/linep(1)*S.signtp_col(iii),ylims(linep(2)) + (ylims(linep(2)))/linep(1)*S.signtp_col(iii)],'color','k','LineStyle','-','Marker',S.colorsign{S.signtp_col(iii)},'MarkerSize',5,'HandleVisibility','off','LineWidth',1.5)
+                            end
                         end
                     end
                     hold on
@@ -214,7 +229,7 @@ for cc = 1:length(condition) %over conditions
                 plot(time,ananmean - stdey,':','Color',COL(cnt,:),'LineWidth',1,'HandleVisibility','off')
                 hold on
             elseif STE == 2
-                fill([time fliplr(time)],[ananmean + stdey fliplr(ananmean - stdey)],COL(cnt,:), 'FaceAlpha', transp,'linestyle','none');
+                fill([time fliplr(time)],[ananmean + stdey fliplr(ananmean - stdey)],COL(cnt,:), 'FaceAlpha', transp,'linestyle','none','HandleVisibility','off');
                 hold on
             end
         end
