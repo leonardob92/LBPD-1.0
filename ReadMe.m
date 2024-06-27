@@ -56,6 +56,10 @@
 %    Serra, E., Lumaca, M., Brattico, E., Vuust, P., Kringelbach, M. L., Bonetti, L. (2023)
 %    Paper: https://www.biorxiv.org/content/10.1101/2023.12.07.570594v1
 %    Leading script (s): https://github.com/leonardob92/MEG_STM_OneNote.git
+% 14)Decoding the elite soccer player’s psychological profile. BiorXiv.
+%    Bonetti, L. *, Vestberg, T. *, Jafari, R., Seghezzi, D., Ingvar, M., Kringelbach, M.L., Goncalves, A.F. *, Petrovic, P. * (2024)
+%    Paper: LINK TO BE PROVIDED LATER
+%    Leading script(s): https://github.com/leonardob92/Soccer_PsychologicalProfile.git
 
 % The folder "LeadingScripts" contains the pipeline of the above referenced study number 1).
 
