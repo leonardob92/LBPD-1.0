@@ -151,7 +151,7 @@ P_val2 = P_val;
 P_val2(P_val > threshMC) = 1;
 %preparing output
 OUT = cell(size(NS3,1),9);
-for ii = 1%:size(NS3,1)
+for ii = 1:size(NS3,1)
     OUT(ii,1) = {ii}; %cluster #
     OUT(ii,2) = {NS3(ii,2)}; %cluster size
     OUT(ii,3) = {P_val2(ii)}; %cluster p-value
