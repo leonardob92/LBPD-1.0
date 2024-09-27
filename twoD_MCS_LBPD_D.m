@@ -1,4 +1,4 @@
-function [ OUT ] = twoD_MCS_LBPD_D( P, thresh, permut, threshMC, perm_max, t1, t2 )
+function [ OUT ] = twoD_MCS_LBPD_D( P, thresh, permut, threshMC, perm_max, t1, t2, T )
 
 % It individuates clusters in a binary 2D matrix and tests their
 % significance by Monte Carlo simulations.
@@ -24,6 +24,7 @@ function [ OUT ] = twoD_MCS_LBPD_D( P, thresh, permut, threshMC, perm_max, t1, t
 %                            If left empty [], default = 1.
 %           -t1:            vector of values describing first dimension (rows) of matrix P (e.g. frequencies)
 %           -t2:            vector of values describing second dimension (columns) of matrix P (e.g. time in seconds)
+%           -T:             matrix of t-values (or analogous statistical values), corresponding to P 
 
 %   OUTPUT: -OUT:           cell matrix with 7 columns corresponding to:
 %                            -cluster #
@@ -33,6 +34,7 @@ function [ OUT ] = twoD_MCS_LBPD_D( P, thresh, permut, threshMC, perm_max, t1, t
 %                            -maximum along first dimension (row)
 %                            -minimum along second dimension (column)
 %                            -maximum along second dimension (column)
+%                            -maximum t-value in absolute terms
 %                           In addition, in the first row of the eight column a matrix with significant elements is stored (useful for plotting purposes) 
 
 
@@ -148,8 +150,8 @@ end
 P_val2 = P_val;
 P_val2(P_val > threshMC) = 1;
 %preparing output
-OUT = cell(size(NS3,1),7);
-for ii = 1:size(NS3,1)
+OUT = cell(size(NS3,1),9);
+for ii = 1%:size(NS3,1)
     OUT(ii,1) = {ii}; %cluster #
     OUT(ii,2) = {NS3(ii,2)}; %cluster size
     OUT(ii,3) = {P_val2(ii)}; %cluster p-value
@@ -158,13 +160,16 @@ for ii = 1:size(NS3,1)
     OUT(ii,5) = {t1(max(dI))}; %max for t1 dimension
     OUT(ii,6) = {t2(min(dJ))}; %min for t2 dimension
     OUT(ii,7) = {t2(max(dJ))}; %max for t2 dimension
+    BUM = T(dI,dJ);
+    [~,dom] = max(abs(BUM(:))); %getting index of maximum t-value for cluster in absolute terms (this extra step is because the value cab be either positive or negative)
+    OUT(ii,8) = {BUM(dom)}; %actual maximum value (either positive or negative)
 end
 %creating a binary matrix with 1s for significant time-frequency elements after MCS correction
 AG2 = zeros(size(AG,1),size(AG,2));
 for ii = 1:size(NS3,1) %over significant clusters
    AG2(AG==NS3(ii,1)) = 1; %assigning one to the numbers coding the significant clusters in the original cluster matrix AG
 end
-OUT(1,8) = {AG2}; %storing matrix
+OUT(1,9) = {AG2}; %storing matrix
 
 end
 
