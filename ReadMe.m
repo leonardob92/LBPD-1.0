@@ -60,6 +60,14 @@
 %    Bonetti, L. *, Vestberg, T. *, Jafari, R., Seghezzi, D., Ingvar, M., Kringelbach, M.L., Goncalves, A.F. *, Petrovic, P. * (2024)
 %    Paper: LINK TO BE PROVIDED LATER
 %    Leading script(s): https://github.com/leonardob92/Soccer_PsychologicalProfile.git
+% 15)Frequency-resolved brain network estimation via source separation (FREQ-NESS), bioRxiv.
+%    Rosso, M., Fernandez-Rubio, G., Keller, P.E., Brattico, E., Vuust, P., Kringelbach., M.L., Bonetti, L. (2024)
+%    Paper: https://www.biorxiv.org/content/10.1101/2024.08.28.610155v1
+%    Leading script(s): https://github.com/mattiaRosso92/Frequency-resolved_brain_network_estimation_via_source_separation_FREQ-NESS.git
+% 16)BROADband brain Network Estimation via Source Separation (BROAD-NESS)", BioRxiv.
+%    Bonetti, L., Fernández-Rubio, G., Andersen, M.H., Malvaso, C., Carlomagno, F., Testa, C., Vuust, P., Kringelbach, M.L., Rosso, M. (2024)
+%    Paper: LINK TO BE PROVIDED LATER
+%    Leading script(s): https://github.com/leonardob92/BROADNESS_MEG_AuditoryRecognition.git
 
 % The folder "LeadingScripts" contains the pipeline of the above referenced study number 1).
 
