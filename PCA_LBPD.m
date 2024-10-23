@@ -216,6 +216,7 @@ for ii = 1:size(S.H,3) %over experimental conditions
     J(:,:,ii) = S.H(:,1:size(wcoeff,2),ii)' * wcoeff(:,PCs); %matrix multiplication for getting a timeseries obtained by multiplying, for each time-point, each voxel activation by its corresponding load
 end
 OUT.PCA_timeseries = J; %storing PCA time series
+OUT.time = time;
 
 %plotting eigenvectors in the brain
 if S.fig_l == 1
