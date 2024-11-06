@@ -21,7 +21,7 @@ function [ OUT ] = PCA_LBPD( S )
 %                           3 = randomising both time and space
 %           -permnum:       number of permutations for Monte-Carlo simulations (e.g. 100 or 1000).
 %                           If negative values, you take a fixed number of components (e.g. -3 = getting the first 3 components and not computing the MCS).  
-%           -fig_l:         1 for plotting some figures illustrating the results; 0 otherwise
+%           -fig_l:         1 for plotting brain netoworks in nifti images; 0 otherwise
 %           -sign_eig:      method for normalizing eigenvectors sign (SUGGESTED EITHER 'max_abs' or 'average'):
 %                            -'occurrences' = using mean of the negative/positive values occurrences
 %                            -'max_abs' = on the basis of the sign of the maximum value in absolute terms
@@ -149,7 +149,7 @@ end
 
 %%% PLOTTING AND STATISTIC SOLUTIONS FOR REAL AND RANDOMIZED DATA
 %plotting variances explained by first 20 PCs for actual and randomised data
-if S.fig_l == 1
+%if S.fig_l == 1
     figure
     plot(vare(1:100),'DisplayName','data')
     if permnum > 0
@@ -171,7 +171,7 @@ if S.fig_l == 1
         caxis([MIN MAX])
         title(['brain sources x time-points - cond ' num2str(ii)])
     end
-end
+%end
 
 if permnum > 0
     PCs = find(vare>MFD); %significant PCs obtained by getting PCs with variance (eigenvalues) higher than the maximum variance (eigenvalues) obtained from randomized data
